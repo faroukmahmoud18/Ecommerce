@@ -84,41 +84,66 @@
                                                 @php 
                                                     $after_discount=($product_detail->price-(($product_detail->price*$product_detail->discount)/100));
                                                 @endphp
-												<p class="price"><span class="discount">${{number_format($after_discount,2)}}</span><s>${{number_format($product_detail->price,2)}}</s> </p>
+												<div id="product-price-section">
+													<p class="price"><span class="discount" id="variant-price-display">${{number_format($after_discount,2)}}</span><s>${{number_format($product_detail->price,2)}}</s> </p>
+												</div>
 												<p class="description">{!!($product_detail->summary)!!}</p>
 											</div>
 											<!--/ End Description -->
-											<!-- Color -->
-											{{-- <div class="color">
-												<h4>Available Options <span>Color</span></h4>
-												<ul>
-													<li><a href="#" class="one"><i class="ti-check"></i></a></li>
-													<li><a href="#" class="two"><i class="ti-check"></i></a></li>
-													<li><a href="#" class="three"><i class="ti-check"></i></a></li>
-													<li><a href="#" class="four"><i class="ti-check"></i></a></li>
-												</ul>
-											</div> --}}
-											<!--/ End Color -->
-											<!-- Size -->
-											@if($product_detail->size)
-												<div class="size mt-4">
-													<h4>Size</h4>
-													<ul>
-														@php 
-															$sizes=explode(',',$product_detail->size);
-															// dd($sizes);
-														@endphp
-														@foreach($sizes as $size)
-														<li><a href="#" class="one">{{$size}}</a></li>
-														@endforeach
-													</ul>
+
+											@if(isset($product_detail->variants) && $product_detail->variants->isNotEmpty())
+											<script>
+												const productVariantsData = @json($product_detail->variants->map(function($variant) {
+													return [
+														'id' => $variant->id,
+														'color_id' => $variant->color_id,
+														'size_id' => $variant->size_id,
+														'specification_id' => $variant->specification_id,
+														'price' => $variant->price,
+														'stock' => $variant->stock,
+														'sku' => $variant->sku,
+														'color_name' => optional($variant->color)->name,
+														'size_name' => optional($variant->size)->name,
+														'specification_name' => optional($variant->specification)->name,
+														'specification_value' => optional($variant->specification)->value,
+													];
+												}));
+
+												// Prepare unique attributes for dropdowns
+												const uniqueColors = [...new Map(productVariantsData.filter(v => v.color_id).map(item => [item.color_id, {id: item.color_id, name: item.color_name}])).values()];
+												const uniqueSizes = [...new Map(productVariantsData.filter(v => v.size_id).map(item => [item.size_id, {id: item.size_id, name: item.size_name}])).values()];
+												const uniqueSpecifications = [...new Map(productVariantsData.filter(v => v.specification_id).map(item => [item.specification_id, {id: item.specification_id, name: item.specification_name, value: item.specification_value}])).values()];
+											</script>
+
+											<div id="variant-selectors">
+												<div class="form-group PDM">
+													<label for="color_id_selector">Color:</label>
+													<select id="color_id_selector" class="form-control PDS nice-select wide">
+														<option value="">Select Color</option>
+													</select>
 												</div>
+												<div class="form-group PDM">
+													<label for="size_id_selector">Size:</label>
+													<select id="size_id_selector" class="form-control PDS nice-select wide">
+														<option value="">Select Size</option>
+													</select>
+												</div>
+												<div class="form-group PDM">
+													<label for="specification_id_selector">Specification:</label>
+													<select id="specification_id_selector" class="form-control PDS nice-select wide">
+														<option value="">Select Specification</option>
+													</select>
+												</div>
+											</div>
 											@endif
-											<!--/ End Size -->
+
 											<!-- Product Buy -->
 											<div class="product-buy">
-												<form action="{{route('single-add-to-cart')}}" method="POST">
+												<form action="{{route('single-add-to-cart')}}" method="POST" id="add-to-cart-form">
 													@csrf 
+													<input type="hidden" name="slug" value="{{$product_detail->slug}}"> {{-- Keep slug for now, controller might use it or variant_id --}}
+													<input type="hidden" name="variant_id" id="selected_variant_id" value="">
+
 													<div class="quantity">
 														<h6>Quantity :</h6>
 														<!-- Input Order -->
@@ -128,7 +153,6 @@
 																	<i class="ti-minus"></i>
 																</button>
 															</div>
-															<input type="hidden" name="slug" value="{{$product_detail->slug}}">
 															<input type="text" name="quant[1]" class="input-number"  data-min="1" data-max="1000" value="1" id="quantity">
 															<div class="button plus">
 																<button type="button" class="btn btn-primary btn-number" data-type="plus" data-field="quant[1]">
@@ -139,7 +163,7 @@
 													<!--/ End Input Order -->
 													</div>
 													<div class="add-to-cart mt-4">
-														<button type="submit" class="btn">Add to cart</button>
+														<button type="submit" class="btn" id="add-to-cart-button" disabled>Add to cart</button>
 														<a href="{{route('add-to-wishlist',$product_detail->slug)}}" class="btn min"><i class="ti-heart"></i></a>
 													</div>
 												</form>
@@ -148,7 +172,15 @@
 												@if($product_detail->sub_cat_info)
 												<p class="cat mt-1">Sub Category :<a href="{{route('product-sub-cat',[$product_detail->cat_info['slug'],$product_detail->sub_cat_info['slug']])}}">{{$product_detail->sub_cat_info['title']}}</a></p>
 												@endif
-												<p class="availability">Stock : @if($product_detail->stock>0)<span class="badge badge-success">{{$product_detail->stock}}</span>@else <span class="badge badge-danger">{{$product_detail->stock}}</span>  @endif</p>
+												<p id="variant-availability" class="availability">Stock :
+													@if(isset($product_detail->variants) && $product_detail->variants->isNotEmpty())
+														<span class="badge badge-warning">Please select options</span>
+													@elseif($product_detail->stock > 0)
+														<span class="badge badge-success">{{$product_detail->stock}}</span>
+													@else
+														<span class="badge badge-danger">{{$product_detail->stock}}</span>
+													@endif
+												</p>
 											</div>
 											<!--/ End Product Buy -->
 										</div>
@@ -530,6 +562,150 @@
 @endpush
 @push('scripts')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    if (typeof productVariantsData !== 'undefined') {
+        const colorSelect = document.getElementById('color_id_selector');
+        const sizeSelect = document.getElementById('size_id_selector');
+        const specSelect = document.getElementById('specification_id_selector');
+        const priceDisplay = document.getElementById('variant-price-display');
+        const stockDisplay = document.getElementById('variant-availability');
+        const addToCartButton = document.getElementById('add-to-cart-button');
+        const selectedVariantInput = document.getElementById('selected_variant_id');
+        const basePriceStrikethrough = document.querySelector('#product-price-section s'); // Assuming this is the original price to strike
+
+        function populateDropdown(selectElement, items, valueField, nameField, nameField2 = null) {
+            if (!selectElement) return;
+            const currentValue = selectElement.value;
+            // selectElement.innerHTML = '<option value="">Select ' + selectElement.labels[0].innerText.replace(':','') + '</option>';
+            // Keep "Select X" if it's the first option
+            if (selectElement.options.length <=1 || selectElement.options[0].value !== "") {
+                 selectElement.innerHTML = '<option value="">Select ' + selectElement.parentElement.firstElementChild.innerText.replace(':','') + '</option>';
+            }
+
+            items.forEach(item => {
+                let itemName = item[nameField];
+                if (nameField2 && item[nameField2]) {
+                    itemName += ` - ${item[nameField2]}`;
+                }
+                const option = document.createElement('option');
+                option.value = item[valueField];
+                option.textContent = itemName;
+                selectElement.appendChild(option);
+            });
+            selectElement.value = currentValue;
+            // Re-initialize nice-select if present
+            if ($(selectElement).hasClass('nice-select')) {
+                $(selectElement).niceSelect('update');
+            }
+        }
+
+        function updateAvailableOptions() {
+            const selectedColor = colorSelect ? colorSelect.value : null;
+            const selectedSize = sizeSelect ? sizeSelect.value : null;
+            const selectedSpec = specSelect ? specSelect.value : null;
+
+            let filteredVariants = productVariantsData;
+
+            if (colorSelect) {
+                let availableColors = uniqueColors;
+                if (selectedSize || selectedSpec) {
+                    const tempFilteredBySizeOrSpec = productVariantsData.filter(v =>
+                        (!selectedSize || v.size_id == selectedSize) &&
+                        (!selectedSpec || v.specification_id == selectedSpec)
+                    );
+                    availableColors = [...new Map(tempFilteredBySizeOrSpec.filter(v => v.color_id).map(item => [item.color_id, {id: item.color_id, name: item.color_name}])).values()];
+                }
+                populateDropdown(colorSelect, availableColors, 'id', 'name');
+                colorSelect.value = selectedColor; // try to keep selection
+            }
+
+            if (sizeSelect) {
+                let availableSizes = uniqueSizes;
+                if (selectedColor || selectedSpec) {
+                     const tempFilteredByColorOrSpec = productVariantsData.filter(v =>
+                        (!selectedColor || v.color_id == selectedColor) &&
+                        (!selectedSpec || v.specification_id == selectedSpec)
+                    );
+                    availableSizes = [...new Map(tempFilteredByColorOrSpec.filter(v => v.size_id).map(item => [item.size_id, {id: item.size_id, name: item.size_name}])).values()];
+                }
+                populateDropdown(sizeSelect, availableSizes, 'id', 'name');
+                sizeSelect.value = selectedSize;
+            }
+
+            if (specSelect) {
+                let availableSpecs = uniqueSpecifications;
+                 if (selectedColor || selectedSize) {
+                    const tempFilteredByColorOrSize = productVariantsData.filter(v =>
+                        (!selectedColor || v.color_id == selectedColor) &&
+                        (!selectedSize || v.size_id == selectedSize)
+                    );
+                    availableSpecs = [...new Map(tempFilteredByColorOrSize.filter(v => v.specification_id).map(item => [item.specification_id, {id: item.specification_id, name: item.specification_name, value: item.specification_value}])).values()];
+                }
+                populateDropdown(specSelect, availableSpecs, 'id', 'name', 'value');
+                specSelect.value = selectedSpec;
+            }
+             if ($(colorSelect).hasClass('nice-select')) $(colorSelect).niceSelect('update');
+             if ($(sizeSelect).hasClass('nice-select')) $(sizeSelect).niceSelect('update');
+             if ($(specSelect).hasClass('nice-select')) $(specSelect).niceSelect('update');
+
+
+            const finalSelectedVariant = productVariantsData.find(variant =>
+                (colorSelect ? variant.color_id == selectedColor : true) &&
+                (sizeSelect ? variant.size_id == selectedSize : true) &&
+                (specSelect ? variant.specification_id == selectedSpec : true) &&
+                // Ensure that if a selector exists, a selection must be made for a variant to be considered fully matched
+                (colorSelect && uniqueColors.length > 0 ? !!selectedColor : true) &&
+                (sizeSelect && uniqueSizes.length > 0 ? !!selectedSize : true) &&
+                (specSelect && uniqueSpecifications.length > 0 ? !!selectedSpec : true)
+            );
+
+            if (finalSelectedVariant) {
+                priceDisplay.textContent = '$' + parseFloat(finalSelectedVariant.price).toFixed(2);
+                if (basePriceStrikethrough) basePriceStrikethrough.style.display = 'none'; // Optionally hide base strikethrough
+
+                if (finalSelectedVariant.stock > 0) {
+                    stockDisplay.innerHTML = `Stock : <span class="badge badge-success">${finalSelectedVariant.stock}</span>`;
+                    addToCartButton.disabled = false;
+                } else {
+                    stockDisplay.innerHTML = `Stock : <span class="badge badge-danger">Out of Stock</span>`;
+                    addToCartButton.disabled = true;
+                }
+                selectedVariantInput.value = finalSelectedVariant.id;
+            } else {
+                // Reset to default or prompt to select if not all options are chosen that could define a variant
+                let requiredSelectionsMade = true;
+                if (uniqueColors.length > 0 && !selectedColor) requiredSelectionsMade = false;
+                if (uniqueSizes.length > 0 && !selectedSize) requiredSelectionsMade = false;
+                if (uniqueSpecifications.length > 0 && !selectedSpec) requiredSelectionsMade = false;
+
+                if (requiredSelectionsMade) { // all dropdowns that have options have a selection, but no variant matches
+                     priceDisplay.textContent = 'N/A';
+                     if (basePriceStrikethrough) basePriceStrikethrough.style.display = 'inline';
+                     stockDisplay.innerHTML = `Stock : <span class="badge badge-danger">Unavailable</span>`;
+                } else { // still needs more selections
+                     priceDisplay.textContent = '$' + parseFloat(@json($after_discount)).toFixed(2); // Show base price
+                     if (basePriceStrikethrough) basePriceStrikethrough.style.display = 'inline';
+                     stockDisplay.innerHTML = `Stock : <span class="badge badge-warning">Please select options</span>`;
+                }
+                addToCartButton.disabled = true;
+                selectedVariantInput.value = '';
+            }
+        }
+
+        if(colorSelect) colorSelect.addEventListener('change', updateAvailableOptions);
+        if(sizeSelect) sizeSelect.addEventListener('change', updateAvailableOptions);
+        if(specSelect) specSelect.addEventListener('change', updateAvailableOptions);
+
+        // Initial population
+        populateDropdown(colorSelect, uniqueColors, 'id', 'name');
+        populateDropdown(sizeSelect, uniqueSizes, 'id', 'name');
+        populateDropdown(specSelect, uniqueSpecifications, 'id', 'name', 'value');
+        updateAvailableOptions(); // Call to set initial state and dependent options
+    }
+});
+</script>
 
     {{-- <script>
         $('.cart').click(function(){

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Wishlist;
 use App\Models\Cart;
+use App\Models\ProductVariant; // Added
 use Illuminate\Support\Str;
 use Helper;
 class CartController extends Controller
@@ -56,44 +57,45 @@ class CartController extends Controller
 
     public function singleAddToCart(Request $request){
         $request->validate([
-            'slug'      =>  'required',
-            'quant'      =>  'required',
+            // 'slug'      =>  'required', // slug is no longer primary identifier for add to cart
+            'variant_id' => 'required|exists:product_variants,id',
+            'quant'      =>  'required|array',
+            'quant.*'    =>  'numeric|min:1' // Ensure quantity is at least 1
         ]);
-        // dd($request->quant[1]);
 
+        $variant_id = $request->input('variant_id');
+        $quantity = $request->quant[1]; // Assuming quant[1] is still the structure
 
-        $product = Product::where('slug', $request->slug)->first();
-        if($product->stock <$request->quant[1]){
-            return back()->with('error','Out of stock, You can add other products.');
+        $variant = ProductVariant::with('product')->findOrFail($variant_id);
+        $product = $variant->product; // Base product for some details if needed
+
+        if($variant->stock < $quantity){
+            return back()->with('error','Out of stock for the selected variant. You can add other products or variants.');
         }
-        if ( ($request->quant[1] < 1) || empty($product) ) {
-            request()->session()->flash('error','Invalid Products');
-            return back();
-        }    
 
-        $already_cart = Cart::where('user_id', auth()->user()->id)->where('order_id',null)->where('product_id', $product->id)->first();
-
-        // return $already_cart;
+        $already_cart = Cart::where('user_id', auth()->user()->id)
+                            ->where('order_id', null)
+                            ->where('variant_id', $variant->id) // Check by variant_id
+                            ->first();
 
         if($already_cart) {
-            $already_cart->quantity = $already_cart->quantity + $request->quant[1];
-            // $already_cart->price = ($product->price * $request->quant[1]) + $already_cart->price ;
-            $already_cart->amount = ($product->price * $request->quant[1])+ $already_cart->amount;
-
-            if ($already_cart->product->stock < $already_cart->quantity || $already_cart->product->stock <= 0) return back()->with('error','Stock not sufficient!.');
-
+            $new_quantity = $already_cart->quantity + $quantity;
+            if ($variant->stock < $new_quantity) {
+                return back()->with('error','Stock not sufficient for the selected variant!. Max available: ' . $variant->stock);
+            }
+            $already_cart->quantity = $new_quantity;
+            $already_cart->amount = $variant->price * $new_quantity; // Use variant's price
             $already_cart->save();
             
         }else{
-            
             $cart = new Cart;
             $cart->user_id = auth()->user()->id;
-            $cart->product_id = $product->id;
-            $cart->price = ($product->price-($product->price*$product->discount)/100);
-            $cart->quantity = $request->quant[1];
-            $cart->amount=($product->price * $request->quant[1]);
-            if ($cart->product->stock < $cart->quantity || $cart->product->stock <= 0) return back()->with('error','Stock not sufficient!.');
-            // return $cart;
+            $cart->product_id = $product->id; // Store base product_id for general reference
+            $cart->variant_id = $variant->id; // Store variant_id
+            $cart->price = $variant->price; // Use variant's price
+            $cart->quantity = $quantity;
+            $cart->amount = $variant->price * $quantity;
+            // Stock check already done above for new cart item
             $cart->save();
         }
         request()->session()->flash('success','Product successfully added to cart.');
@@ -120,27 +122,35 @@ class CartController extends Controller
             foreach ($request->quant as $k=>$quant) {
                 // return $k;
                 $id = $request->qty_id[$k];
-                // return $id;
-                $cart = Cart::find($id);
-                // return $cart;
-                if($quant > 0 && $cart) {
-                    // return $quant;
+                $cart = Cart::with('variant.product')->find($id); // Eager load variant and its product
 
-                    if($cart->product->stock < $quant){
-                        request()->session()->flash('error','Out of stock');
-                        return back();
+                if($quant > 0 && $cart && $cart->variant) {
+                    if($cart->variant->stock < $quant){
+                        // Set quantity to max available stock if requested quantity is too high
+                        $quant = $cart->variant->stock;
+                        request()->session()->flash('error',"Quantity for '{$cart->variant->product->title}' (Variant: {$cart->variant->id}) adjusted to max available stock: {$quant}.");
+                        // Do not immediately return; allow other items to be updated. Error will be flashed.
                     }
-                    $cart->quantity = ($cart->product->stock > $quant) ? $quant  : $cart->product->stock;
-                    // return $cart;
                     
-                    if ($cart->product->stock <=0) continue;
-                    $after_price=($cart->product->price-($cart->product->price*$cart->product->discount)/100);
-                    $cart->amount = $after_price * $quant;
-                    // return $cart->price;
+                    if ($quant <= 0) { // If adjusted quant is 0 or less (e.g. stock was 0)
+                        // Optionally delete the cart item if quantity becomes 0
+                        // $cart->delete();
+                        // request()->session()->flash('info', "Item '{$cart->variant->product->title}' removed as stock is 0 or requested quantity invalid.");
+                        // continue;
+                        // For now, let's just prevent negative/zero quantity update if not deleting
+                        $error[] = "Invalid quantity for item '{$cart->variant->product->title}'.";
+                        continue;
+                    }
+
+                    $cart->quantity = $quant;
+                    $cart->amount = $cart->variant->price * $quant; // Use variant's price
                     $cart->save();
                     $success = 'Cart successfully updated!';
-                }else{
-                    $error[] = 'Cart Invalid!';
+                } else if (!$cart->variant) {
+                    $error[] = 'Cart item references an invalid product variant.';
+                }
+                else {
+                    $error[] = 'Cart Invalid or item quantity is zero!';
                 }
             }
             return back()->with($error)->with('success', $success);

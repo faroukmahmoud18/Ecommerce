@@ -73,16 +73,68 @@
           <span class="text-danger">{{$message}}</span>
           @enderror
         </div>
+        {{-- Old Size field removed --}}
+
+        {{-- Product Variations Section --}}
         <div class="form-group">
-          <label for="size">Size</label>
-          <select name="size[]" class="form-control selectpicker"  multiple data-live-search="true">
-              <option value="">--Select any size--</option>
-              <option value="S">Small (S)</option>
-              <option value="M">Medium (M)</option>
-              <option value="L">Large (L)</option>
-              <option value="XL">Extra Large (XL)</option>
-          </select>
+          <label class="col-form-label">Product Variations</label>
+          <div id="product-variations-container">
+            {{-- Initial variation row (index 0) --}}
+            <div class="variation-row row mb-2">
+              <div class="col-md-2">
+                <label>Color</label>
+                <select name="variants[0][color_id]" class="form-control">
+                  <option value="">-- Select Color --</option>
+                  @if(isset($colors))
+                    @foreach($colors as $color)
+                      <option value="{{ $color->id }}">{{ $color->name }}</option>
+                    @endforeach
+                  @endif
+                </select>
+              </div>
+              <div class="col-md-2">
+                <label>Size</label>
+                <select name="variants[0][size_id]" class="form-control">
+                  <option value="">-- Select Size --</option>
+                  @if(isset($sizes))
+                    @foreach($sizes as $size)
+                      <option value="{{ $size->id }}">{{ $size->name }}</option>
+                    @endforeach
+                  @endif
+                </select>
+              </div>
+              <div class="col-md-2">
+                <label>Specification</label>
+                <select name="variants[0][specification_id]" class="form-control">
+                  <option value="">-- Select Specification --</option>
+                  @if(isset($specifications))
+                    @foreach($specifications as $spec)
+                      <option value="{{ $spec->id }}">{{ $spec->name }} - {{ $spec->value }}</option>
+                    @endforeach
+                  @endif
+                </select>
+              </div>
+              <div class="col-md-2">
+                <label>Price <span class="text-danger">*</span></label>
+                <input type="number" name="variants[0][price]" placeholder="Variant Price" class="form-control" required>
+              </div>
+              <div class="col-md-1">
+                <label>Stock <span class="text-danger">*</span></label>
+                <input type="number" name="variants[0][stock]" placeholder="Stock" class="form-control" required>
+              </div>
+              <div class="col-md-2">
+                <label>SKU</label>
+                <input type="text" name="variants[0][sku]" placeholder="Variant SKU" class="form-control">
+              </div>
+              <div class="col-md-1">
+                <label>&nbsp;</label>
+                <button type="button" class="btn btn-danger btn-sm remove-variation-row" style="display:none;">Remove</button>
+              </div>
+            </div>
+          </div>
+          <button type="button" id="add-variation-row" class="btn btn-primary btn-sm mt-2">Add Variation</button>
         </div>
+        {{-- End Product Variations Section --}}
 
         <div class="form-group">
           <label for="brand_id">Brand</label>
@@ -159,28 +211,103 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
 
 <script>
-   $(document).ready(function() {
-  // Initialize file manager with error handling
-  $('#lfm').filemanager('image').on('error', function(e, data) {
-    console.error('FileManager Error:', data);
-    alert('Error uploading file: ' + data.message);
-  });
+ $(document).ready(function() {
+    // Initialize file manager with error handling
+    $('#lfm').filemanager('image').on('error', function(e, data) {
+        console.error('FileManager Error:', data);
+        alert('Error uploading file: ' + data.message);
+    });
 
-  // Summernote configuration with explicit image upload settings
-  const summernoteConfig = {
-    placeholder: "Write detail description.....",
-    tabsize: 2,
-    height: 150,
-    callbacks: {
-      onImageUploadError: function(msg) {
-        console.error('Image upload error:', msg);
-        alert('Image upload failed: ' + msg);
-      }
+    // Summernote configuration with explicit image upload settings
+    const summernoteConfig = {
+        placeholder: "Write detail description.....",
+        tabsize: 2,
+        height: 150,
+        callbacks: {
+        onImageUploadError: function(msg) {
+            console.error('Image upload error:', msg);
+            alert('Image upload failed: ' + msg);
+        }
+        }
+    };
+
+    $('#summary').summernote({ ...summernoteConfig, height: 100 });
+    $('#description').summernote(summernoteConfig);
+
+    // Product Variations Script
+    let variationIndex = 1; // Start index for new rows
+
+    $('#add-variation-row').on('click', function() {
+        // Prepare options for dropdowns - this is a bit verbose here, ideally, this could be cleaner perhaps with a hidden template row
+        let colorsOptions = '<option value="">-- Select Color --</option>';
+        @if(isset($colors))
+            @foreach($colors as $color)
+                colorsOptions += `<option value="{{ $color->id }}">{{ $color->name }}</option>`;
+            @endforeach
+        @endif
+
+        let sizesOptions = '<option value="">-- Select Size --</option>';
+        @if(isset($sizes))
+            @foreach($sizes as $size)
+                sizesOptions += `<option value="{{ $size->id }}">{{ $size->name }}</option>`;
+            @endforeach
+        @endif
+
+        let specificationsOptions = '<option value="">-- Select Specification --</option>';
+        @if(isset($specifications))
+            @foreach($specifications as $spec)
+                specificationsOptions += `<option value="{{ $spec->id }}">{{ $spec->name }} - {{ $spec->value }}</option>`;
+            @endforeach
+        @endif
+
+        const variationRowHtml = `
+        <div class="variation-row row mb-2">
+            <div class="col-md-2">
+            <select name="variants[${variationIndex}][color_id]" class="form-control">
+                ${colorsOptions}
+            </select>
+            </div>
+            <div class="col-md-2">
+            <select name="variants[${variationIndex}][size_id]" class="form-control">
+                ${sizesOptions}
+            </select>
+            </div>
+            <div class="col-md-2">
+            <select name="variants[${variationIndex}][specification_id]" class="form-control">
+                ${specificationsOptions}
+            </select>
+            </div>
+            <div class="col-md-2">
+            <input type="number" name="variants[${variationIndex}][price]" placeholder="Variant Price" class="form-control" required>
+            </div>
+            <div class="col-md-1">
+            <input type="number" name="variants[${variationIndex}][stock]" placeholder="Stock" class="form-control" required>
+            </div>
+            <div class="col-md-2">
+            <input type="text" name="variants[${variationIndex}][sku]" placeholder="Variant SKU" class="form-control">
+            </div>
+            <div class="col_md-1">
+            <button type="button" class="btn btn-danger btn-sm remove-variation-row">Remove</button>
+            </div>
+        </div>`;
+        $('#product-variations-container').append(variationRowHtml);
+        variationIndex++;
+        updateRemoveButtons();
+    });
+
+    $('#product-variations-container').on('click', '.remove-variation-row', function() {
+        $(this).closest('.variation-row').remove();
+        updateRemoveButtons();
+    });
+
+    function updateRemoveButtons() {
+        if ($('#product-variations-container .variation-row').length > 1) {
+        $('.remove-variation-row').show();
+        } else {
+        $('.remove-variation-row').first().hide(); // Hide remove button for the first row if it's the only one
+        }
     }
-  };
-
-  $('#summary').summernote({ ...summernoteConfig, height: 100 });
-  $('#description').summernote(summernoteConfig);
+    updateRemoveButtons(); // Initial check
 });
 </script>
 
