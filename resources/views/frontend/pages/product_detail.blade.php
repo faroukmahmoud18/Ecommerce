@@ -369,7 +369,20 @@
                                                 <a title="Compare" href="#"><i class="ti-bar-chart-alt"></i><span>Add to Compare</span></a>
                                             </div>
                                             <div class="product-action-2">
-                                                <a title="Add to cart" href="#">Add to cart</a>
+                                                @php
+                                                    $current_product_for_check = $data; // $data is the product in this loop
+                                                    $has_variants = isset($current_product_for_check->variants_count) && $current_product_for_check->variants_count > 0;
+                                                @endphp
+                                                @if($has_variants)
+                                                    <a title="Select Options" href="{{ route('product-detail', $current_product_for_check->slug) }}" style="width:100%; text-align:center;">Select Options</a>
+                                                @else
+                                                    <form action="{{ route('single-add-to-cart') }}" method="POST" style="display: inline; width:100%;">
+                                                        @csrf
+                                                        <input type="hidden" name="slug" value="{{ $current_product_for_check->slug }}">
+                                                        <input type="hidden" name="quant[1]" value="1">
+                                                        <button type="submit" class="button-link-style" title="Add to cart" style="width:100%; text-align:center; background-color: #C70039; color:white; padding: 10px 0;">Add to cart</button>
+                                                    </form>
+                                                @endif
                                             </div>
                                         </div>
                                     </div>
@@ -516,6 +529,17 @@
 		/* Rating */
 		.rating_box {
 		display: inline-flex;
+		}
+
+        .button-link-style { /* Basic styling for form button to look like a link/button */
+            background: none!important;
+            border: none;
+            padding: 0!important;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: inherit;
+            display: inline-block;
+        }
 		}
 
 		.star-rating {
@@ -703,6 +727,41 @@ document.addEventListener('DOMContentLoaded', function () {
         populateDropdown(sizeSelect, uniqueSizes, 'id', 'name');
         populateDropdown(specSelect, uniqueSpecifications, 'id', 'name', 'value');
         updateAvailableOptions(); // Call to set initial state and dependent options
+    } else {
+        // Handle simple products (no variants)
+        const stockDisplay = document.getElementById('variant-availability');
+        const addToCartButton = document.getElementById('add-to-cart-button');
+        const selectedVariantInput = document.getElementById('selected_variant_id');
+        const priceDisplay = document.getElementById('variant-price-display');
+        const basePriceStrikethrough = document.querySelector('#product-price-section s');
+
+        const baseProductStock = {{ $product_detail->stock ?? 0 }};
+        const baseProductPrice = {{ $product_detail->price ?? 0 }};
+        const baseProductDiscount = {{ $product_detail->discount ?? 0 }};
+        const priceAfterBaseDiscount = baseProductPrice * (1 - baseProductDiscount / 100);
+
+        if (baseProductStock > 0) {
+            if(stockDisplay) stockDisplay.innerHTML = `Stock : <span class="badge badge-success">${baseProductStock}</span>`;
+            if(addToCartButton) addToCartButton.disabled = false;
+        } else {
+            if(stockDisplay) stockDisplay.innerHTML = `Stock : <span class="badge badge-danger">Out of Stock</span>`;
+            if(addToCartButton) addToCartButton.disabled = true;
+        }
+        if(selectedVariantInput) selectedVariantInput.value = '';
+
+        if(priceDisplay) priceDisplay.textContent = '$' + parseFloat(priceAfterBaseDiscount).toFixed(2);
+
+        if (basePriceStrikethrough) {
+            if (baseProductDiscount > 0) {
+                basePriceStrikethrough.textContent = '$' + parseFloat(baseProductPrice).toFixed(2);
+                basePriceStrikethrough.style.display = 'inline';
+            } else {
+                basePriceStrikethrough.style.display = 'none';
+            }
+        }
+        // Hide variant selectors if they exist but there's no variant data
+        const variantSelectorsDiv = document.getElementById('variant-selectors');
+        if(variantSelectorsDiv) variantSelectorsDiv.style.display = 'none';
     }
 });
 </script>

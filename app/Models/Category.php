@@ -37,13 +37,14 @@ class Category extends Model
         return $this->hasMany('App\Models\Product','child_cat_id','id')->where('status','active');
     }
     public static function getProductByCat($slug){
-        // dd($slug);
-        return Category::with('products')->where('slug',$slug)->first();
-        // return Product::where('cat_id',$id)->where('child_cat_id',null)->paginate(10);
+        return Category::with(['products' => function ($query) {
+            $query->withCount('variants');
+        }])->where('slug',$slug)->first();
     }
     public static function getProductBySubCat($slug){
-        // return $slug;
-        return Category::with('sub_products')->where('slug',$slug)->first();
+        return Category::with(['sub_products' => function ($query) {
+            $query->withCount('variants');
+        }])->where('slug',$slug)->first();
     }
     public static function countActiveCategory(){
         $data=Category::where('status','active')->count();

@@ -47,7 +47,23 @@
 											<td class="image" data-title="No"><img src="{{$photo[0]}}" alt="{{$photo[0]}}"></td>
 											<td class="product-des" data-title="Description">
 												<p class="product-name"><a href="{{route('product-detail',$cart->product['slug'])}}" target="_blank">{{$cart->product['title']}}</a></p>
-												<p class="product-des">{!!($cart['summary']) !!}</p>
+												@if($cart->variant)
+													<small class="product-variant-details" style="display: block; margin-top: 5px;">
+														@if($cart->variant->sku)
+															SKU: {{ $cart->variant->sku }}<br>
+														@endif
+														@if($cart->variant->color)
+															Color: {{ $cart->variant->color->name }}<br>
+														@endif
+														@if($cart->variant->size)
+															Size: {{ $cart->variant->size->name }}<br>
+														@endif
+														@if($cart->variant->specification)
+															{{ $cart->variant->specification->name }}: {{ $cart->variant->specification->value }}
+														@endif
+													</small>
+												@endif
+												{{-- <p class="product-des">{!!($cart['summary']) !!}</p> --}} {{-- Display product summary from $cart->product->summary if needed --}}
 											</td>
 											<td class="price" data-title="Price"><span>${{number_format($cart['price'],2)}}</span></td>
 											<td class="qty" data-title="Qty"><!-- Input Order -->

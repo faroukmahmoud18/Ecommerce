@@ -7,7 +7,8 @@ use App\Models\Order;
 use App\Models\Wishlist;
 use App\Models\Shipping;
 use App\Models\Cart;
-// use Auth;
+use Illuminate\Support\Facades\Auth; // Added for Auth facade
+
 class Helper{
     public static function messageList()
     {
@@ -83,8 +84,8 @@ class Helper{
     // Cart Count
     public static function cartCount($user_id=''){
        
-        if(Auth::check()){
-            if($user_id=="") $user_id=auth()->user()->id;
+        if(Auth::check()){ // Using facade, so this should work
+            if($user_id=="") $user_id=Auth::user()->id; // Using facade
             return Cart::where('user_id',$user_id)->where('order_id',null)->sum('quantity');
         }
         else{
@@ -97,18 +98,24 @@ class Helper{
     }
 
     public static function getAllProductFromCart($user_id=''){
-        if(Auth::check()){
-            if($user_id=="") $user_id=auth()->user()->id;
-            return Cart::with('product')->where('user_id',$user_id)->where('order_id',null)->get();
+        if(Auth::check()){ // Using facade
+            if($user_id=="") $user_id=Auth::user()->id; // Using facade
+            return Cart::with([
+                'product',
+                'variant',
+                'variant.color',
+                'variant.size',
+                'variant.specification'
+            ])->where('user_id',$user_id)->where('order_id',null)->get();
         }
         else{
-            return 0;
+            return collect(); // Return an empty collection if not authenticated or no items
         }
     }
     // Total amount cart
     public static function totalCartPrice($user_id=''){
-        if(Auth::check()){
-            if($user_id=="") $user_id=auth()->user()->id;
+        if(Auth::check()){ // Using facade
+            if($user_id=="") $user_id=Auth::user()->id; // Using facade
             return Cart::where('user_id',$user_id)->where('order_id',null)->sum('amount');
         }
         else{
@@ -118,8 +125,8 @@ class Helper{
     // Wishlist Count
     public static function wishlistCount($user_id=''){
        
-        if(Auth::check()){
-            if($user_id=="") $user_id=auth()->user()->id;
+        if(Auth::check()){ // Using facade
+            if($user_id=="") $user_id=Auth::user()->id; // Using facade
             return Wishlist::where('user_id',$user_id)->where('cart_id',null)->sum('quantity');
         }
         else{
@@ -127,17 +134,18 @@ class Helper{
         }
     }
     public static function getAllProductFromWishlist($user_id=''){
-        if(Auth::check()){
-            if($user_id=="") $user_id=auth()->user()->id;
+        if(Auth::check()){ // Using facade
+            if($user_id=="") $user_id=Auth::user()->id; // Using facade
+            // Wishlist products already load variants_count due to Wishlist model change
             return Wishlist::with('product')->where('user_id',$user_id)->where('cart_id',null)->get();
         }
         else{
-            return 0;
+            return collect(); // Return an empty collection
         }
     }
     public static function totalWishlistPrice($user_id=''){
-        if(Auth::check()){
-            if($user_id=="") $user_id=auth()->user()->id;
+        if(Auth::check()){ // Using facade
+            if($user_id=="") $user_id=Auth::user()->id; // Using facade
             return Wishlist::where('user_id',$user_id)->where('cart_id',null)->sum('amount');
         }
         else{

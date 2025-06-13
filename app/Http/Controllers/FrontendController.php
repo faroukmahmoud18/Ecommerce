@@ -25,18 +25,24 @@ class FrontendController extends Controller
     }
 
     public function home(){
-        $featured=Product::where('status','active')->where('is_featured',1)->orderBy('price','DESC')->limit(2)->get();
+        $featured=Product::withCount('variants')->where('status','active')->where('is_featured',1)->orderBy('price','DESC')->limit(2)->get();
         $posts=Post::where('status','active')->orderBy('id','DESC')->limit(3)->get();
         $banners=Banner::where('status','active')->limit(3)->orderBy('id','DESC')->get();
-        // return $banner;
-        $products=Product::where('status','active')->orderBy('id','DESC')->limit(8)->get();
+
+        // For "Trending Item" and "Hot Item" sections that use $product_lists
+        $product_lists=Product::withCount('variants')->where('status','active')->orderBy('id','DESC')->limit(8)->get();
+
+        // For "Latest Items" section (previously a DB::table query in blade)
+        $latest_products=Product::withCount('variants')->where('status','active')->orderBy('id','DESC')->limit(6)->get();
+
         $category=Category::where('status','active')->where('is_parent',1)->orderBy('title','ASC')->get();
-        // return $category;
+
         return view('frontend.index')
                 ->with('featured',$featured)
                 ->with('posts',$posts)
                 ->with('banners',$banners)
-                ->with('product_lists',$products)
+                ->with('product_lists',$product_lists) // Used for Trending and Hot Items
+                ->with('latest_products', $latest_products) // Specifically for Latest Items
                 ->with('category_lists',$category);
     }   
 
@@ -89,18 +95,19 @@ class FrontendController extends Controller
             $products->whereBetween('price',$price);
         }
 
-        $recent_products=Product::where('status','active')->orderBy('id','DESC')->limit(3)->get();
-        // Sort by number
+        $recent_products=Product::withCount('variants')->where('status','active')->orderBy('id','DESC')->limit(3)->get();
+
+        // Apply withCount before pagination
+        $products->withCount('variants');
+
         if(!empty($_GET['show'])){
-            $products=$products->where('status','active')->paginate($_GET['show']);
+            $products_paginated=$products->where('status','active')->paginate($_GET['show']);
         }
         else{
-            $products=$products->where('status','active')->paginate(9);
+            $products_paginated=$products->where('status','active')->paginate(9);
         }
-        // Sort by name , price, category
-
       
-        return view('frontend.pages.product-grids')->with('products',$products)->with('recent_products',$recent_products);
+        return view('frontend.pages.product-grids')->with('products',$products_paginated)->with('recent_products',$recent_products);
     }
     public function productLists(){
         $products=Product::query();
@@ -137,18 +144,19 @@ class FrontendController extends Controller
             $products->whereBetween('price',$price);
         }
 
-        $recent_products=Product::where('status','active')->orderBy('id','DESC')->limit(3)->get();
-        // Sort by number
+        $recent_products=Product::withCount('variants')->where('status','active')->orderBy('id','DESC')->limit(3)->get();
+
+        // Apply withCount before pagination
+        $products->withCount('variants');
+
         if(!empty($_GET['show'])){
-            $products=$products->where('status','active')->paginate($_GET['show']);
+            $products_paginated=$products->where('status','active')->paginate($_GET['show']);
         }
         else{
-            $products=$products->where('status','active')->paginate(6);
+            $products_paginated=$products->where('status','active')->paginate(6);
         }
-        // Sort by name , price, category
-
       
-        return view('frontend.pages.product-lists')->with('products',$products)->with('recent_products',$recent_products);
+        return view('frontend.pages.product-lists')->with('products',$products_paginated)->with('recent_products',$recent_products);
     }
     public function productFilter(Request $request){
             $data= $request->all();
@@ -200,8 +208,8 @@ class FrontendController extends Controller
             }
     }
     public function productSearch(Request $request){
-        $recent_products=Product::where('status','active')->orderBy('id','DESC')->limit(3)->get();
-        $products=Product::orwhere('title','like','%'.$request->search.'%')
+        $recent_products=Product::withCount('variants')->where('status','active')->orderBy('id','DESC')->limit(3)->get();
+        $products=Product::withCount('variants')->orwhere('title','like','%'.$request->search.'%')
                     ->orwhere('slug','like','%'.$request->search.'%')
                     ->orwhere('description','like','%'.$request->search.'%')
                     ->orwhere('summary','like','%'.$request->search.'%')
@@ -212,10 +220,11 @@ class FrontendController extends Controller
     }
 
     public function productBrand(Request $request){
-        $products=Brand::getProductByBrand($request->slug);
-        $recent_products=Product::where('status','active')->orderBy('id','DESC')->limit(3)->get();
+        // The getProductByBrand method in Brand model needs to be updated to include withCount('variants')
+        $brand_products_collection=Brand::getProductByBrand($request->slug);
+        $recent_products=Product::withCount('variants')->where('status','active')->orderBy('id','DESC')->limit(3)->get();
         if(request()->is('e-shop.loc/product-grids')){
-            return view('frontend.pages.product-grids')->with('products',$products->products)->with('recent_products',$recent_products);
+            return view('frontend.pages.product-grids')->with('products',$brand_products_collection->products)->with('recent_products',$recent_products);
         }
         else{
             return view('frontend.pages.product-lists')->with('products',$products->products)->with('recent_products',$recent_products);
@@ -223,12 +232,12 @@ class FrontendController extends Controller
 
     }
     public function productCat(Request $request){
-        $products=Category::getProductByCat($request->slug);
-        // return $request->slug;
-        $recent_products=Product::where('status','active')->orderBy('id','DESC')->limit(3)->get();
+        // The getProductByCat method in Category model needs to be updated to include withCount('variants')
+        $category_products_collection=Category::getProductByCat($request->slug);
+        $recent_products=Product::withCount('variants')->where('status','active')->orderBy('id','DESC')->limit(3)->get();
 
         if(request()->is('e-shop.loc/product-grids')){
-            return view('frontend.pages.product-grids')->with('products',$products->products)->with('recent_products',$recent_products);
+            return view('frontend.pages.product-grids')->with('products',$category_products_collection->products)->with('recent_products',$recent_products);
         }
         else{
             return view('frontend.pages.product-lists')->with('products',$products->products)->with('recent_products',$recent_products);
@@ -236,12 +245,12 @@ class FrontendController extends Controller
 
     }
     public function productSubCat(Request $request){
-        $products=Category::getProductBySubCat($request->sub_slug);
-        // return $products;
-        $recent_products=Product::where('status','active')->orderBy('id','DESC')->limit(3)->get();
+        // The getProductBySubCat method in Category model needs to be updated to include withCount('variants')
+        $category_products_collection=Category::getProductBySubCat($request->sub_slug);
+        $recent_products=Product::withCount('variants')->where('status','active')->orderBy('id','DESC')->limit(3)->get();
 
         if(request()->is('e-shop.loc/product-grids')){
-            return view('frontend.pages.product-grids')->with('products',$products->sub_products)->with('recent_products',$recent_products);
+            return view('frontend.pages.product-grids')->with('products',$category_products_collection->sub_products)->with('recent_products',$recent_products);
         }
         else{
             return view('frontend.pages.product-lists')->with('products',$products->sub_products)->with('recent_products',$recent_products);
