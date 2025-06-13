@@ -183,20 +183,7 @@
                                                         <a title="Wishlist" href="{{route('add-to-wishlist',$product->slug)}}" class="wishlist" data-id="{{$product->id}}"><i class=" ti-heart "></i><span>Add to Wishlist</span></a>
                                                     </div>
                                                     <div class="product-action-2">
-                                                        @php
-                                                            $current_product_for_check = $product;
-                                                            $has_variants = isset($current_product_for_check->variants_count) && $current_product_for_check->variants_count > 0;
-                                                        @endphp
-                                                        @if($has_variants)
-                                                            <a title="Select Options" href="{{ route('product-detail', $current_product_for_check->slug) }}" style="width:100%; text-align:center;">Select Options</a>
-                                                        @else
-                                                            <form action="{{ route('single-add-to-cart') }}" method="POST" style="display: inline; width:100%;">
-                                                                @csrf
-                                                                <input type="hidden" name="slug" value="{{ $product->slug }}">
-                                                                <input type="hidden" name="quant[1]" value="1">
-                                                                <button type="submit" class="button-link-style" title="Add to cart" style="width:100%; text-align:center; background-color: #C70039; color:white; padding: 10px 0;">Add to cart</button>
-                                                            </form>
-                                                        @endif
+                                                        <a title="Add to cart" href="{{route('add-to-cart',$product->slug)}}">Add to cart</a>
                                                     </div>
                                                 </div>
                                             </div>
@@ -302,49 +289,71 @@
                                             <div class="quickview-peragraph">
                                                 <p>{!! html_entity_decode($product->summary) !!}</p>
                                             </div>
-                                            {{-- Old Size display based on comma separated $product->size removed for Quick View --}}
-                                            {{-- Color/Size selects in quick view also removed as variants redirect to detail page --}}
-
-                                            @php
-                                                $current_product_for_modal_check = $product;
-                                                $has_variants_modal = isset($current_product_for_modal_check->variants_count) && $current_product_for_modal_check->variants_count > 0;
-                                            @endphp
-
-                                            @if($has_variants_modal)
-                                                <div class="add-to-cart mt-4"> {{-- mt-4 to give some space if other elements were removed --}}
-                                                    <a href="{{ route('product-detail', $product->slug) }}" class="btn" style="width:100%;">Select Options</a>
-                                                    {{-- Wishlist button can still be here if desired for the base product --}}
-                                                    {{-- <a href="{{route('add-to-wishlist',$product->slug)}}" class="btn min"><i class="ti-heart"></i></a> --}}
+                                            @if($product->size)
+                                                <div class="size">
+                                                    <h4>Size</h4>
+                                                    <ul>
+                                                        @php
+                                                            $sizes=explode(',',$product->size);
+                                                            // dd($sizes);
+                                                        @endphp
+                                                        @foreach($sizes as $size)
+                                                        <li><a href="#" class="one">{{$size}}</a></li>
+                                                        @endforeach
+                                                    </ul>
                                                 </div>
-                                            @else
-                                                <form action="{{route('single-add-to-cart')}}" method="POST" class="mt-4">
-                                                    @csrf
-                                                    <div class="quantity">
-                                                        <!-- Input Order -->
-                                                        <div class="input-group">
-                                                            <div class="button minus">
-                                                                <button type="button" class="btn btn-primary btn-number" disabled="disabled" data-type="minus" data-field="quant[modal-{{$product->id}}]">
-                                                                    <i class="ti-minus"></i>
-                                                                </button>
-                                                            </div>
-                                                            <input type="hidden" name="slug" value="{{$product->slug}}">
-                                                            <input type="text" name="quant[1]" class="input-number" data-min="1" data-max="1000" value="1" id="modal-quant-{{$product->id}}">
-                                                            <div class="button plus">
-                                                                <button type="button" class="btn btn-primary btn-number" data-type="plus" data-field="quant[modal-{{$product->id}}]">
-                                                                    <i class="ti-plus"></i>
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                        <!--/ End Input Order -->
-                                                    </div>
-                                                    <div class="add-to-cart">
-                                                        <button type="submit" class="btn">Add to cart</button>
-                                                        {{-- Wishlist button can still be here --}}
-                                                        {{-- <a href="{{route('add-to-wishlist',$product->slug)}}" class="btn min"><i class="ti-heart"></i></a> --}}
-                                                    </div>
-                                                </form>
                                             @endif
-                                            <div class="default-social mt-4"> {{-- Added mt-4 for spacing --}}
+                                            <div class="size">
+                                                <div class="row">
+                                                    <div class="col-lg-6 col-12">
+                                                        <h5 class="title">Size</h5>
+                                                        <select>
+                                                            @php
+                                                            $sizes=explode(',',$product->size);
+                                                            // dd($sizes);
+                                                            @endphp
+                                                            @foreach($sizes as $size)
+                                                                <option>{{$size}}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                    {{-- <div class="col-lg-6 col-12">
+                                                        <h5 class="title">Color</h5>
+                                                        <select>
+                                                            <option selected="selected">orange</option>
+                                                            <option>purple</option>
+                                                            <option>black</option>
+                                                            <option>pink</option>
+                                                        </select>
+                                                    </div> --}}
+                                                </div>
+                                            </div>
+                                            <form action="{{route('single-add-to-cart')}}" method="POST">
+                                                @csrf
+                                                <div class="quantity">
+                                                    <!-- Input Order -->
+                                                    <div class="input-group">
+                                                        <div class="button minus">
+                                                            <button type="button" class="btn btn-primary btn-number" disabled="disabled" data-type="minus" data-field="quant[1]">
+                                                                <i class="ti-minus"></i>
+                                                            </button>
+                                                        </div>
+                                                        <input type="hidden" name="slug" value="{{$product->slug}}">
+                                                        <input type="text" name="quant[1]" class="input-number"  data-min="1" data-max="1000" value="1">
+                                                        <div class="button plus">
+                                                            <button type="button" class="btn btn-primary btn-number" data-type="plus" data-field="quant[1]">
+                                                                <i class="ti-plus"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <!--/ End Input Order -->
+                                                </div>
+                                                <div class="add-to-cart">
+                                                    <button type="submit" class="btn">Add to cart</button>
+                                                    <a href="{{route('add-to-wishlist',$product->slug)}}" class="btn min"><i class="ti-heart"></i></a>
+                                                </div>
+                                            </form>
+                                            <div class="default-social">
                                             <!-- ShareThis BEGIN --><div class="sharethis-inline-share-buttons"></div><!-- ShareThis END -->
                                             </div>
                                         </div>
@@ -371,18 +380,6 @@
         padding:8px 16px;
         margin-top:10px;
         color: white;
-    }
-    .button-link-style { /* Basic styling for form button to look like a link/button */
-        background: none!important;
-        border: none;
-        padding: 0!important;
-        /* color: #069; */ /* Link color */
-        /* text-decoration: underline; */
-        cursor: pointer;
-        font-family: inherit;
-        font-size: inherit;
-        display: inline-block; /* Allows width/height and padding like a button */
-        /* Add other button-like styles if needed, or use existing .btn classes and override */
     }
 </style>
 @endpush

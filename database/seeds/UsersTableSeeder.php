@@ -1,12 +1,7 @@
 <?php
 
-namespace Database\Seeders; // Assuming namespace
-
 use Illuminate\Database\Seeder;
-use App\Models\User; // Assuming model namespace
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\DB; // For truncate if needed
-
 class UsersTableSeeder extends Seeder
 {
     /**
@@ -16,29 +11,23 @@ class UsersTableSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('users')->truncate(); // Optional: Clear existing users
+        $data=array(
+            array(
+                'name'=>'Admin',
+                'email'=>'admin@gmail.com',
+                'password'=>Hash::make('1111'),
+                'role'=>'admin',
+                'status'=>'active'
+            ),
+            array(
+                'name'=>'User',
+                'email'=>'user@gmail.com',
+                'password'=>Hash::make('1111'),
+                'role'=>'user',
+                'status'=>'active'
+            ),
+        );
 
-        // Admin User
-        User::factory()->create([
-            'name' => 'Admin User',
-            'email' => 'admin@example.com',
-            'password' => Hash::make('password'), // More secure default
-            'role' => 'admin',
-            'status' => 'active',
-        ]);
-
-        // Regular Users
-        User::factory()->create([
-            'name' => 'Regular User One',
-            'email' => 'user1@example.com',
-            'password' => Hash::make('password'),
-            'role' => 'user',
-            'status' => 'active',
-        ]);
-
-        User::factory()->count(3)->create([
-            'role' => 'user',
-            'status' => 'active',
-        ]); // Creates 3 more regular users
+        DB::table('users')->insert($data);
     }
 }

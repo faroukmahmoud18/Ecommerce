@@ -134,20 +134,7 @@
                                                     <a title="Wishlist" href="{{route('add-to-wishlist',$product->slug)}}" ><i class=" ti-heart "></i><span>Add to Wishlist</span></a>
                                                 </div>
                                                 <div class="product-action-2">
-                                                    @php
-                                                        $current_product_for_check = $product;
-                                                        $has_variants = isset($current_product_for_check->variants_count) && $current_product_for_check->variants_count > 0;
-                                                    @endphp
-                                                    @if($has_variants)
-                                                        <a title="Select Options" href="{{ route('product-detail', $current_product_for_check->slug) }}" style="width:100%; text-align:center;">Select Options</a>
-                                                    @else
-                                                        <form action="{{ route('single-add-to-cart') }}" method="POST" style="display: inline; width:100%;">
-                                                            @csrf
-                                                            <input type="hidden" name="slug" value="{{ $current_product_for_check->slug }}">
-                                                            <input type="hidden" name="quant[1]" value="1">
-                                                            <button type="submit" class="button-link-style" title="Add to cart" style="width:100%; text-align:center; background-color: #C70039; color:white; padding: 10px 0;">Add to cart</button>
-                                                        </form>
-                                                    @endif
+                                                    <a title="Add to cart" href="{{route('add-to-cart',$product->slug)}}">Add to cart</a>
                                                 </div>
                                             </div>
                                         </div>
@@ -241,20 +228,7 @@
                                         <a title="Wishlist" href="{{route('add-to-wishlist',$product->slug)}}" ><i class=" ti-heart "></i><span>Add to Wishlist</span></a>
                                     </div>
                                     <div class="product-action-2">
-                                        @php
-                                            $current_product_for_check = $product;
-                                            $has_variants = isset($current_product_for_check->variants_count) && $current_product_for_check->variants_count > 0;
-                                        @endphp
-                                        @if($has_variants)
-                                            <a title="Select Options" href="{{ route('product-detail', $current_product_for_check->slug) }}" style="width:100%; text-align:center;">Select Options</a>
-                                        @else
-                                            <form action="{{ route('single-add-to-cart') }}" method="POST" style="display: inline; width:100%;">
-                                                @csrf
-                                                <input type="hidden" name="slug" value="{{ $current_product_for_check->slug }}">
-                                                <input type="hidden" name="quant[1]" value="1">
-                                                <button type="submit" class="button-link-style" title="Add to cart" style="width:100%; text-align:center; background-color: #C70039; color:white; padding: 10px 0;">Add to cart</button>
-                                            </form>
-                                        @endif
+                                        <a href="{{route('add-to-cart',$product->slug)}}">Add to cart</a>
                                     </div>
                                 </div>
                             </div>
@@ -307,21 +281,7 @@
                                             // dd($photo);
                                         @endphp
                                         <img src="{{$photo[0]}}" alt="{{$photo[0]}}">
-                                        {{-- Conditional Add to Cart for Latest Items --}}
-                                        @php
-                                            $current_product_for_check = $product; // $product is now from $latest_products (Eloquent)
-                                            $has_variants = isset($current_product_for_check->variants_count) && $current_product_for_check->variants_count > 0;
-                                        @endphp
-                                        @if($has_variants)
-                                            <a href="{{ route('product-detail', $current_product_for_check->slug) }}" class="buy" title="Select Options"><i class="fa fa-search"></i></a>
-                                        @else
-                                            <form action="{{ route('single-add-to-cart') }}" method="POST" class="buy-form-overlay">
-                                                @csrf
-                                                <input type="hidden" name="slug" value="{{ $current_product_for_check->slug }}">
-                                                <input type="hidden" name="quant[1]" value="1">
-                                                <button type="submit" class="buy-button-overlay" title="Add to cart"><i class="fa fa-shopping-bag"></i></button>
-                                            </form>
-                                        @endif
+                                        <a href="{{route('add-to-cart',$product->slug)}}" class="buy"><i class="fa fa-shopping-bag"></i></a>
                                     </div>
                                 </div>
                                 <div class="col-lg-6 col-md-6 col-12 no-padding">
@@ -491,45 +451,59 @@
                                         <div class="quickview-peragraph">
                                             <p>{!! html_entity_decode($product->summary) !!}</p>
                                         </div>
-                                            {{-- Remove old size/color quick view options for variants --}}
-                                            @php
-                                                // Use $current_product_for_check for consistency if $product is from a loop
-                                                $current_product_for_modal_check = $product;
-                                                $has_variants_modal = isset($current_product_for_modal_check->variants_count) && $current_product_for_modal_check->variants_count > 0;
-                                            @endphp
-
-                                            @if($has_variants_modal)
-                                                <div class="add-to-cart mt-4">
-                                                    <a href="{{ route('product-detail', $current_product_for_modal_check->slug) }}" class="btn" style="width:100%;">Select Options</a>
-                                            </div>
-                                            @else
-                                                <form action="{{route('single-add-to-cart')}}" method="POST" class="mt-4">
-                                                    @csrf
-                                                    <div class="quantity">
-                                                        <!-- Input Order -->
-                                                        <div class="input-group">
-                                                            <div class="button minus">
-                                                                <button type="button" class="btn btn-primary btn-number" disabled="disabled" data-type="minus" data-field="quant[modal-{{$current_product_for_modal_check->id}}]">
-                                                                    <i class="ti-minus"></i>
-                                                                </button>
-                                                            </div>
-                                                            <input type="hidden" name="slug" value="{{$current_product_for_modal_check->slug}}">
-                                                            <input type="text" name="quant[1]" class="input-number" data-min="1" data-max="1000" value="1" id="modal-quant-{{$current_product_for_modal_check->id}}">
-                                                            <div class="button plus">
-                                                                <button type="button" class="btn btn-primary btn-number" data-type="plus" data-field="quant[modal-{{$current_product_for_modal_check->id}}]">
-                                                                    <i class="ti-plus"></i>
-                                                                </button>
-                                                            </div>
+                                        @if($product->size)
+                                            <div class="size">
+                                                <div class="row">
+                                                    <div class="col-lg-6 col-12">
+                                                        <h5 class="title">Size</h5>
+                                                        <select>
+                                                            @php
+                                                            $sizes=explode(',',$product->size);
+                                                            // dd($sizes);
+                                                            @endphp
+                                                            @foreach($sizes as $size)
+                                                                <option>{{$size}}</option>
+                                                            @endforeach
+                                                        </select>
                                                     </div>
-                                                        <!--/ End Input Order -->
-                                                    </div>
-                                                    <div class="add-to-cart">
-                                                        <button type="submit" class="btn">Add to cart</button>
-                                                        <a href="{{route('add-to-wishlist',$current_product_for_modal_check->slug)}}" class="btn min"><i class="ti-heart"></i></a>
+                                                    {{-- <div class="col-lg-6 col-12">
+                                                        <h5 class="title">Color</h5>
+                                                        <select>
+                                                            <option selected="selected">orange</option>
+                                                            <option>purple</option>
+                                                            <option>black</option>
+                                                            <option>pink</option>
+                                                        </select>
+                                                    </div> --}}
                                                 </div>
-                                                </form>
-                                            @endif
-                                            <div class="default-social  mt-4">
+                                            </div>
+                                        @endif
+                                        <form action="{{route('single-add-to-cart')}}" method="POST" class="mt-4">
+                                            @csrf
+                                            <div class="quantity">
+                                                <!-- Input Order -->
+                                                <div class="input-group">
+                                                    <div class="button minus">
+                                                        <button type="button" class="btn btn-primary btn-number" disabled="disabled" data-type="minus" data-field="quant[1]">
+                                                            <i class="ti-minus"></i>
+                                                        </button>
+                                                    </div>
+													<input type="hidden" name="slug" value="{{$product->slug}}">
+                                                    <input type="text" name="quant[1]" class="input-number"  data-min="1" data-max="1000" value="1">
+                                                    <div class="button plus">
+                                                        <button type="button" class="btn btn-primary btn-number" data-type="plus" data-field="quant[1]">
+                                                            <i class="ti-plus"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <!--/ End Input Order -->
+                                            </div>
+                                            <div class="add-to-cart">
+                                                <button type="submit" class="btn">Add to cart</button>
+                                                <a href="{{route('add-to-wishlist',$product->slug)}}" class="btn min"><i class="ti-heart"></i></a>
+                                            </div>
+                                        </form>
+                                        <div class="default-social">
                                         <!-- ShareThis BEGIN --><div class="sharethis-inline-share-buttons"></div><!-- ShareThis END -->
                                         </div>
                                     </div>

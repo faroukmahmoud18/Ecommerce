@@ -9,8 +9,8 @@
          </div>
      </div>
     <div class="card-header py-3">
-      <h6 class="m-0 font-weight-bold text-primary float-left">Product Lists</h6>
-      <a href="{{route('product.create')}}" class="btn btn-primary btn-sm float-right" data-toggle="tooltip" data-placement="bottom" title="Add User"><i class="fas fa-plus"></i> Add Product</a>
+      <h6 class="m-0 font-weight-bold text-primary float-left">{{__('product.page_title_index')}}</h6>
+      <a href="{{route('product.create')}}" class="btn btn-primary btn-sm float-right" data-toggle="tooltip" data-placement="bottom" title="{{__('product.add_new_button_tooltip')}}"><i class="fas fa-plus"></i> {{__('product.add_new_button')}}</a>
     </div>
     <div class="card-body">
       <div class="table-responsive">
@@ -18,36 +18,36 @@
         <table class="table table-bordered" id="product-dataTable" width="100%" cellspacing="0">
           <thead>
             <tr>
-              <th>S.N.</th>
-              <th>Title</th>
-              <th>Category</th>
-              <th>Is Featured</th>
-              <th>Price</th>
-              <th>Discount</th>
-              <th>Size</th>
-              <th>Condition</th>
-              <th>Brand</th>
-              <th>Stock</th>
-              <th>Photo</th>
-              <th>Status</th>
-              <th>Action</th>
+              <th>{{__('admin_common.table_header_sn')}}</th>
+              <th>{{__('admin_common.table_header_title')}}</th>
+              <th>{{__('product.table_header_category')}}</th>
+              <th>{{__('product.table_header_is_featured')}}</th>
+              <th>{{__('admin_common.table_header_price')}}</th>
+              <th>{{__('product.table_header_discount')}}</th>
+              <th>{{__('admin_common.table_header_size')}}</th>
+              <th>{{__('product.table_header_condition')}}</th>
+              <th>{{__('product.table_header_brand')}}</th>
+              <th>{{__('admin_common.table_header_stock')}}</th>
+              <th>{{__('admin_common.table_header_photo')}}</th>
+              <th>{{__('admin_common.table_header_status')}}</th>
+              <th>{{__('admin_common.table_header_actions')}}</th>
             </tr>
           </thead>
           <tfoot>
             <tr>
-              <th>S.N.</th>
-              <th>Title</th>
-              <th>Category</th>
-              <th>Is Featured</th>
-              <th>Price</th>
-              <th>Discount</th>
-              <th>Size</th>
-              <th>Condition</th>
-              <th>Brand</th>
-              <th>Stock</th>
-              <th>Photo</th>
-              <th>Status</th>
-              <th>Action</th>
+              <th>{{__('admin_common.table_header_sn')}}</th>
+              <th>{{__('admin_common.table_header_title')}}</th>
+              <th>{{__('product.table_header_category')}}</th>
+              <th>{{__('product.table_header_is_featured')}}</th>
+              <th>{{__('admin_common.table_header_price')}}</th>
+              <th>{{__('product.table_header_discount')}}</th>
+              <th>{{__('admin_common.table_header_size')}}</th>
+              <th>{{__('product.table_header_condition')}}</th>
+              <th>{{__('product.table_header_brand')}}</th>
+              <th>{{__('admin_common.table_header_stock')}}</th>
+              <th>{{__('admin_common.table_header_photo')}}</th>
+              <th>{{__('admin_common.table_header_status')}}</th>
+              <th>{{__('admin_common.table_header_actions')}}</th>
             </tr>
           </tfoot>
           <tbody>
@@ -66,9 +66,9 @@
                           {{$product->sub_cat_info->title ?? ''}}
                       </sub>
                     </td>
-                    <td>{{(($product->is_featured==1)? 'Yes': 'No')}}</td>
-                    <td>Rs. {{$product->price}} /-</td>
-                    <td>  {{$product->discount}}% OFF</td>
+                    <td>{{(($product->is_featured==1)? __('admin_common.yes') : __('admin_common.no'))}}</td>
+                    <td>{{__('admin_common.currency_symbol')}} {{$product->price}} {{__('admin_common.price_suffix')}}</td>
+                    <td>  {{$product->discount}}{{__('product.discount_suffix')}}</td>
                     <td>{{$product->size}}</td>
                     <td>{{$product->condition}}</td>
                     <td> {{ucfirst($product->brand->title)}}</td>
@@ -98,11 +98,11 @@
                         @endif
                     </td>
                     <td>
-                        <a href="{{route('product.edit',$product->id)}}" class="btn btn-primary btn-sm float-left mr-1" style="height:30px; width:30px;border-radius:50%" data-toggle="tooltip" title="edit" data-placement="bottom"><i class="fas fa-edit"></i></a>
+                        <a href="{{route('product.edit',$product->id)}}" class="btn btn-primary btn-sm float-left mr-1" style="height:30px; width:30px;border-radius:50%" data-toggle="tooltip" title="{{__('admin_common.edit_button_tooltip')}}" data-placement="bottom"><i class="fas fa-edit"></i></a>
                     <form method="POST" action="{{route('product.destroy',[$product->id])}}">
                       @csrf
                       @method('delete')
-                          <button class="btn btn-danger btn-sm dltBtn" data-id={{$product->id}} style="height:30px; width:30px;border-radius:50%" data-toggle="tooltip" data-placement="bottom" title="Delete"><i class="fas fa-trash-alt"></i></button>
+                          <button class="btn btn-danger btn-sm dltBtn" data-id={{$product->id}} style="height:30px; width:30px;border-radius:50%" data-toggle="tooltip" data-placement="bottom" title="{{__('admin_common.delete_button_tooltip')}}"><i class="fas fa-trash-alt"></i></button>
                         </form>
                     </td>
                 </tr>
@@ -111,7 +111,7 @@
         </table>
         <span style="float:right">{{$products->links()}}</span>
         @else
-          <h6 class="text-center">No Products found!!! Please create Product</h6>
+          <h6 class="text-center">{{__('product.no_products_found')}}</h6>
         @endif
       </div>
     </div>
@@ -175,8 +175,8 @@
               // alert(dataID);
               e.preventDefault();
               swal({
-                    title: "Are you sure?",
-                    text: "Once deleted, you will not be able to recover this data!",
+                    title: "{{__('admin_common.sweetalert_title_are_you_sure')}}",
+                    text: "{{__('admin_common.sweetalert_text_once_deleted')}}",
                     icon: "warning",
                     buttons: true,
                     dangerMode: true,
@@ -185,7 +185,7 @@
                     if (willDelete) {
                        form.submit();
                     } else {
-                        swal("Your data is safe!");
+                        swal("{{__('admin_common.sweetalert_text_data_safe')}}");
                     }
                 });
           })

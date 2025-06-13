@@ -8,8 +8,10 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
+     *
+     * @return void
      */
-    public function up(): void
+    public function up()
     {
         Schema::create('product_color', function (Blueprint $table) {
             $table->foreignId('product_id')->constrained()->onDelete('cascade');
@@ -25,15 +27,17 @@ return new class extends Migration
 
         Schema::create('product_specification', function (Blueprint $table) {
             $table->foreignId('product_id')->constrained()->onDelete('cascade');
-            $table->foreignId('specification_id')->constrained()->onDelete('cascade');
+            $table->foreignId('specification_id')->constrained('specifications')->onDelete('cascade');
             $table->primary(['product_id', 'specification_id']);
         });
     }
 
     /**
      * Reverse the migrations.
+     *
+     * @return void
      */
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('product_specification');
         Schema::dropIfExists('product_size');

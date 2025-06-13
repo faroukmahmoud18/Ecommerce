@@ -58,7 +58,7 @@ class LoginController extends Controller
         // dd($users);
         if($users){
             Auth::login($users);
-            return redirect('/')->with('success','You are login from '.$provider);
+            return redirect('/')->with('success',__('flash_messages.auth_logged_in_via_provider', ['PROVIDER' => $provider]));
         }else{
             $user = User::create([
                 'name'          => $userSocial->getName(),

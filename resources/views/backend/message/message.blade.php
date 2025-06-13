@@ -13,7 +13,7 @@
     <!-- Dropdown - Messages -->
     <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="messagesDropdown">
         <h6 class="dropdown-header">
-        Message Center
+        {{__('message.dropdown_header_message_center')}}
         </h6>
         <div id="message-items">
             @foreach(Helper::messageList() as $message)
@@ -48,7 +48,7 @@
             </div>
             </a> --}}
         </div>
-        <a class="dropdown-item text-center small text-gray-500" href="{{route('message.index')}}">Read More Messages</a>
+        <a class="dropdown-item text-center small text-gray-500" href="{{route('message.index')}}">{{__('message.dropdown_read_more_messages')}}</a>
     </div>
 </div>
 

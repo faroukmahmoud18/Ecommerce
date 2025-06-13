@@ -3,31 +3,31 @@
 @section('main-content')
 
 <div class="card">
-    <h5 class="card-header">Add Post Category</h5>
+    <h5 class="card-header">{{__('post_category.page_title_create')}}</h5>
     <div class="card-body">
       <form method="post" action="{{route('post-category.store')}}">
         {{csrf_field()}}
         <div class="form-group">
-          <label for="inputTitle" class="col-form-label">Title</label>
-          <input id="inputTitle" type="text" name="title" placeholder="Enter title"  value="{{old('title')}}" class="form-control">
+          <label for="inputTitle" class="col-form-label">{{__('admin_common.form_label_title')}}</label>
+          <input id="inputTitle" type="text" name="title" placeholder="{{__('admin_common.form_placeholder_title')}}"  value="{{old('title')}}" class="form-control">
           @error('title')
           <span class="text-danger">{{$message}}</span>
           @enderror
         </div>
 
         <div class="form-group">
-          <label for="status" class="col-form-label">Status</label>
+          <label for="status" class="col-form-label">{{__('admin_common.form_label_status')}}</label>
           <select name="status" class="form-control">
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
+              <option value="active">{{__('admin_common.status_active')}}</option>
+              <option value="inactive">{{__('admin_common.status_inactive')}}</option>
           </select>
           @error('status')
           <span class="text-danger">{{$message}}</span>
           @enderror
         </div>
         <div class="form-group mb-3">
-          <button type="reset" class="btn btn-warning">Reset</button>
-           <button class="btn btn-success" type="submit">Submit</button>
+          <button type="reset" class="btn btn-warning">{{__('admin_common.button_reset')}}</button>
+           <button class="btn btn-success" type="submit">{{__('admin_common.button_submit')}}</button>
         </div>
       </form>
     </div>

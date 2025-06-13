@@ -6,17 +6,17 @@
        @include('backend.layouts.notification')
     </div>
   </div>
-  <h5 class="card-header">Messages</h5>
+  <h5 class="card-header">{{__('message.page_title_index')}}</h5>
   <div class="card-body">
     @if(count($messages)>0)
     <table class="table message-table" id="message-dataTable">
       <thead>
         <tr>
-          <th scope="col">ID</th>
-          <th scope="col">Name</th>
-          <th scope="col">Subject</th>
-          <th scope="col">Date</th>
-          <th scope="col">Action</th>
+          <th scope="col">{{__('admin_common.table_header_id')}}</th>
+          <th scope="col">{{__('message.table_header_name')}}</th>
+          <th scope="col">{{__('message.table_header_subject')}}</th>
+          <th scope="col">{{__('admin_common.table_header_date')}}</th>
+          <th scope="col">{{__('admin_common.table_header_actions')}}</th>
         </tr>
       </thead>
       <tbody>
@@ -28,11 +28,11 @@
           <td>{{$message->subject}}</td>
           <td>{{$message->created_at->format('F d, Y h:i A')}}</td>
           <td>
-            <a href="{{route('message.show',$message->id)}}" class="btn btn-primary btn-sm float-left mr-1" style="height:30px; width:30px;border-radius:50%" data-toggle="tooltip" title="view" data-placement="bottom"><i class="fas fa-eye"></i></a>
+            <a href="{{route('message.show',$message->id)}}" class="btn btn-primary btn-sm float-left mr-1" style="height:30px; width:30px;border-radius:50%" data-toggle="tooltip" title="{{__('admin_common.view_button_tooltip')}}" data-placement="bottom"><i class="fas fa-eye"></i></a>
             <form method="POST" action="{{route('message.destroy',[$message->id])}}">
               @csrf 
               @method('delete')
-                  <button class="btn btn-danger btn-sm dltBtn" data-id={{$message->id}} style="height:30px; width:30px;border-radius:50%" data-toggle="tooltip" data-placement="bottom" title="Delete"><i class="fas fa-trash-alt"></i></button>
+                  <button class="btn btn-danger btn-sm dltBtn" data-id={{$message->id}} style="height:30px; width:30px;border-radius:50%" data-toggle="tooltip" data-placement="bottom" title="{{__('admin_common.delete_button_tooltip')}}"><i class="fas fa-trash-alt"></i></button>
             </form>
           </td>
         </tr>
@@ -44,7 +44,7 @@
       {{$messages->links()}}
     </nav>
     @else
-      <h2>Messages Empty!</h2>
+      <h2>{{__('message.no_messages_empty')}}</h2>
     @endif
   </div>
 </div>
@@ -102,8 +102,8 @@
             // alert(dataID);
             e.preventDefault();
             swal({
-                  title: "Are you sure?",
-                  text: "Once deleted, you will not be able to recover this data!",
+                  title: "{{__('admin_common.sweetalert_title_are_you_sure')}}",
+                  text: "{{__('admin_common.sweetalert_text_once_deleted')}}",
                   icon: "warning",
                   buttons: true,
                   dangerMode: true,
@@ -112,7 +112,7 @@
                   if (willDelete) {
                     form.submit();
                   } else {
-                      swal("Your data is safe!");
+                      swal("{{__('admin_common.sweetalert_text_data_safe')}}");
                   }
               });
         })

@@ -57,7 +57,7 @@ class OrderController extends Controller
         ]);
     
         if (empty(Cart::where('user_id', auth()->user()->id)->where('order_id', null)->first())) {
-            request()->session()->flash('error', 'Cart is Empty!');
+            request()->session()->flash('error', __('flash_messages.cart_is_empty'));
             return back();
         }
     
@@ -108,7 +108,7 @@ class OrderController extends Controller
         // Notify admin
         $users = User::where('role', 'admin')->first();
         $details = [
-            'title' => 'New order created',
+            'title' => __('notification.new_order_created_title'),
             'actionURL' => route('order.show', $order->id),
             'fas' => 'fa-file-alt'
         ];
@@ -123,7 +123,7 @@ class OrderController extends Controller
     
         Cart::where('user_id', auth()->user()->id)->where('order_id', null)->update(['order_id' => $order->id]);
     
-        request()->session()->flash('success', 'Your product has been successfully placed in order');
+        request()->session()->flash('success', __('flash_messages.order_placed_success'));
         return redirect()->route('home');
     }
     
@@ -178,10 +178,10 @@ class OrderController extends Controller
         }
         $status=$order->fill($data)->save();
         if($status){
-            request()->session()->flash('success','Successfully updated order');
+            request()->session()->flash('success',__('flash_messages.order_updated_success'));
         }
         else{
-            request()->session()->flash('error','Error while updating order');
+            request()->session()->flash('error',__('flash_messages.order_updated_error'));
         }
         return redirect()->route('order.index');
     }
@@ -198,15 +198,15 @@ class OrderController extends Controller
         if($order){
             $status=$order->delete();
             if($status){
-                request()->session()->flash('success','Order Successfully deleted');
+                request()->session()->flash('success',__('flash_messages.order_deleted_success'));
             }
             else{
-                request()->session()->flash('error','Order can not deleted');
+                request()->session()->flash('error',__('flash_messages.order_deleted_error'));
             }
             return redirect()->route('order.index');
         }
         else{
-            request()->session()->flash('error','Order can not found');
+            request()->session()->flash('error',__('flash_messages.order_not_found'));
             return redirect()->back();
         }
     }
@@ -220,28 +220,28 @@ class OrderController extends Controller
         $order=Order::where('user_id',auth()->user()->id)->where('order_number',$request->order_number)->first();
         if($order){
             if($order->status=="new"){
-            request()->session()->flash('success','Your order has been placed. please wait.');
+            request()->session()->flash('success',__('flash_messages.order_track_status_new'));
             return redirect()->route('home');
 
             }
             elseif($order->status=="process"){
-                request()->session()->flash('success','Your order is under processing please wait.');
+                request()->session()->flash('success',__('flash_messages.order_track_status_process'));
                 return redirect()->route('home');
     
             }
             elseif($order->status=="delivered"){
-                request()->session()->flash('success','Your order is successfully delivered.');
+                request()->session()->flash('success',__('flash_messages.order_track_status_delivered'));
                 return redirect()->route('home');
     
             }
             else{
-                request()->session()->flash('error','Your order canceled. please try again');
+                request()->session()->flash('error',__('flash_messages.order_track_status_canceled'));
                 return redirect()->route('home');
     
             }
         }
         else{
-            request()->session()->flash('error','Invalid order numer please try again');
+            request()->session()->flash('error',__('flash_messages.order_track_invalid_number'));
             return back();
         }
     }

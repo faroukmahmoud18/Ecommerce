@@ -47,22 +47,7 @@
 											<p class="product-des">{!!($wishlist['summary']) !!}</p>
 										</td>
 										<td class="total-amount" data-title="Total"><span>${{$wishlist['amount']}}</span></td>
-										<td class="add-to-cart-cell" data-title="Add to Cart"> {{-- Added a class for potential styling --}}
-											@php
-												$current_product_for_check = $wishlist->product; // Product object from wishlist
-												$has_variants = isset($current_product_for_check->variants_count) && $current_product_for_check->variants_count > 0;
-											@endphp
-											@if($has_variants)
-												<a href="{{ route('product-detail', $current_product_for_check->slug) }}" class="btn">Select Options</a>
-											@else
-												<form action="{{ route('single-add-to-cart') }}" method="POST" style="display: inline;">
-													@csrf
-													<input type="hidden" name="slug" value="{{ $current_product_for_check->slug }}">
-													<input type="hidden" name="quant[1]" value="1">
-													<button type="submit" class="btn text-white">Add To Cart</button>
-												</form>
-											@endif
-										</td>
+										<td><a href="{{route('add-to-cart',$wishlist->product['slug'])}}" class='btn text-white'>Add To Cart</a></td>
 										<td class="action" data-title="Remove"><a href="{{route('wishlist-delete',$wishlist->id)}}"><i class="ti-trash remove-icon"></i></a></td>
 									</tr>
 								@endforeach
