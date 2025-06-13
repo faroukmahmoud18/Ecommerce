@@ -13,9 +13,11 @@ return new class extends Migration
     {
         Schema::create('specifications', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
+            $table->string('name');
             $table->string('value');
             $table->timestamps();
+
+            $table->unique(['name', 'value']); // Changed unique constraint
         });
     }
 

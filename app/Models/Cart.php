@@ -4,9 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\ProductVariant; // Added import
+use Illuminate\Database\Eloquent\Factories\HasFactory; // Added
 
 class Cart extends Model
 {
+    use HasFactory; // Added
     protected $fillable=['user_id','product_id', 'variant_id', 'order_id','quantity','amount','price','status']; // Added 'variant_id'
     
     public function product()
