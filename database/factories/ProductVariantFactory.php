@@ -8,6 +8,7 @@ use App\Models\Color;
 use App\Models\Size;
 use App\Models\Specification;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str; // Added
 
 class ProductVariantFactory extends Factory
 {
@@ -32,7 +33,7 @@ class ProductVariantFactory extends Factory
             'specification_id' => null, // Optional: Specification::factory()
             'price' => $this->faker->randomFloat(2, 5, 500), // Variant price
             'stock' => $this->faker->numberBetween(0, 100),
-            'sku' => $this->faker->optional()->unique()->ean13,
+            'sku' => 'SKU-' . strtoupper(Str::random(8)), // More robust unique SKU
         ];
     }
 

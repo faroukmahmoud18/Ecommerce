@@ -3,9 +3,11 @@
 namespace App\Models;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory; // Added
 
 class Brand extends Model
 {
+    use HasFactory; // Added
     protected $fillable=['title','slug','status'];
 
     // public static function getProductByBrand($id){

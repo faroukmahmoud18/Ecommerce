@@ -6,9 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Cart; // Assuming Wishlist and Brand are also in App\Models
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory; // Added
 
 class Product extends Model
 {
+    use HasFactory; // Added
     protected $fillable=['title','slug','summary','description','cat_id','child_cat_id','price','brand_id','discount','status','photo','size','stock','is_featured','condition'];
 
     public function cat_info(){
