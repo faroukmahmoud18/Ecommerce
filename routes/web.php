@@ -131,6 +131,12 @@
         Route::resource('banner', 'BannerController');
         // Brand
         Route::resource('brand', 'BrandController');
+        // Color
+        Route::resource('colors', \App\Http\Controllers\Admin\ColorController::class);
+        // Size
+        Route::resource('sizes', \App\Http\Controllers\Admin\SizeController::class);
+        // Specification
+        Route::resource('specifications', \App\Http\Controllers\Admin\SpecificationController::class);
         // Profile
         Route::get('/profile', [AdminController::class, 'profile'])->name('admin-profile');
         Route::post('/profile/{id}', [AdminController::class, 'profileUpdate'])->name('profile-update');

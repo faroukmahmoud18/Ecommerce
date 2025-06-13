@@ -199,7 +199,20 @@
 																	<a title="Wishlist" href="{{route('add-to-wishlist',$product->slug)}}" class="wishlist" data-id="{{$product->id}}"><i class=" ti-heart "></i><span>Add to Wishlist</span></a>
 																</div>
 																<div class="product-action-2">
-																	<a title="Add to cart" href="{{route('add-to-cart',$product->slug)}}">Add to cart</a>
+																	@php
+																		$current_product_for_check = $product;
+																		$has_variants = isset($current_product_for_check->variants_count) && $current_product_for_check->variants_count > 0;
+																	@endphp
+																	@if($has_variants)
+																		<a title="Select Options" href="{{ route('product-detail', $current_product_for_check->slug) }}">Select Options</a>
+																	@else
+																		<form action="{{ route('single-add-to-cart') }}" method="POST" style="display: inline;">
+																			@csrf
+																			<input type="hidden" name="slug" value="{{ $current_product_for_check->slug }}">
+																			<input type="hidden" name="quant[1]" value="1">
+																			<button type="submit" class="button-link-style" title="Add to cart">Add to cart</button>
+																		</form>
+																	@endif
 																</div>
 															</div>
 														</div>
@@ -219,7 +232,21 @@
 														{{-- <p>{!! html_entity_decode($product->summary) !!}</p> --}}
 														</div>
 														<p class="des pt-2">{!! html_entity_decode($product->summary) !!}</p>
-														<a href="javascript:void(0)" class="btn cart" data-id="{{$product->id}}">Buy Now!</a>
+														{{-- Replace Buy Now with conditional logic --}}
+														@php
+															$current_product_for_check = $product; // Already defined in this scope for the list item
+															$has_variants = isset($current_product_for_check->variants_count) && $current_product_for_check->variants_count > 0;
+														@endphp
+														@if($has_variants)
+															<a href="{{ route('product-detail', $current_product_for_check->slug) }}" class="btn">Select Options</a>
+														@else
+															<form action="{{ route('single-add-to-cart') }}" method="POST" style="display: inline;">
+																@csrf
+																<input type="hidden" name="slug" value="{{ $current_product_for_check->slug }}">
+																<input type="hidden" name="quant[1]" value="1">
+																<button type="submit" class="btn">Add to Cart</button> {{-- Using btn class for similar appearance --}}
+															</form>
+														@endif
 													</div>
 												</div>
 											</div>
@@ -309,45 +336,43 @@
 												<div class="quickview-peragraph">
 													<p>{!! html_entity_decode($product->summary) !!}</p>
 												</div>
-												@if($product->size)
-													<div class="size">
-														<h4>Size</h4>
-														<ul>
-															@php 
-																$sizes=explode(',',$product->size);
-																// dd($sizes);
-															@endphp
-															@foreach($sizes as $size)
-															<li><a href="#" class="one">{{$size}}</a></li>
-															@endforeach
-														</ul>
-													</div>
-												@endif
-												<form action="{{route('single-add-to-cart')}}" method="POST">
-													@csrf 
-													<div class="quantity">
-														<!-- Input Order -->
-														<div class="input-group">
-															<div class="button minus">
-																<button type="button" class="btn btn-primary btn-number" disabled="disabled" data-type="minus" data-field="quant[1]">
-																	<i class="ti-minus"></i>
-																</button>
-															</div>
-															<input type="hidden" name="slug" value="{{$product->slug}}">
-															<input type="text" name="quant[1]" class="input-number"  data-min="1" data-max="1000" value="1">
-															<div class="button plus">
-																<button type="button" class="btn btn-primary btn-number" data-type="plus" data-field="quant[1]">
-																	<i class="ti-plus"></i>
-																</button>
-															</div>
-														</div>
-														<!--/ End Input Order -->
-													</div>
-													<div class="add-to-cart">
-														<button type="submit" class="btn">Add to cart</button>
-														<a href="{{route('add-to-wishlist',$product->slug)}}" class="btn min"><i class="ti-heart"></i></a>
-													</div>
-												</form>
+												{{-- Remove old size display and hardcoded selects from quick view modal --}}
+												@php
+                                                    $current_product_for_modal_check = $product;
+                                                    $has_variants_modal = isset($current_product_for_modal_check->variants_count) && $current_product_for_modal_check->variants_count > 0;
+                                                @endphp
+
+                                                @if($has_variants_modal)
+                                                    <div class="add-to-cart mt-4">
+                                                        <a href="{{ route('product-detail', $current_product_for_modal_check->slug) }}" class="btn" style="width:100%;">Select Options</a>
+                                                    </div>
+                                                @else
+                                                    <form action="{{route('single-add-to-cart')}}" method="POST" class="mt-4">
+                                                        @csrf
+                                                        <div class="quantity">
+                                                            <!-- Input Order -->
+                                                            <div class="input-group">
+                                                                <div class="button minus">
+                                                                    <button type="button" class="btn btn-primary btn-number" disabled="disabled" data-type="minus" data-field="quant[modal-{{$current_product_for_modal_check->id}}]">
+                                                                        <i class="ti-minus"></i>
+                                                                    </button>
+                                                                </div>
+                                                                <input type="hidden" name="slug" value="{{$current_product_for_modal_check->slug}}">
+                                                                <input type="text" name="quant[1]" class="input-number"  data-min="1" data-max="1000" value="1" id="modal-quant-{{$current_product_for_modal_check->id}}">
+                                                                <div class="button plus">
+                                                                    <button type="button" class="btn btn-primary btn-number" data-type="plus" data-field="quant[modal-{{$current_product_for_modal_check->id}}]">
+                                                                        <i class="ti-plus"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                            <!--/ End Input Order -->
+                                                        </div>
+                                                        <div class="add-to-cart">
+                                                            <button type="submit" class="btn">Add to cart</button>
+                                                            <a href="{{route('add-to-wishlist',$current_product_for_modal_check->slug)}}" class="btn min"><i class="ti-heart"></i></a>
+                                                        </div>
+                                                    </form>
+                                                @endif
 												<div class="default-social">
 												<!-- ShareThis BEGIN --><div class="sharethis-inline-share-buttons"></div><!-- ShareThis END -->
 												</div>
@@ -374,6 +399,19 @@
         padding:8px 16px;
         margin-top:10px;
         color: white;
+    }
+    .button-link-style { /* Basic styling for form button to look like a link/button */
+        background: none!important;
+        border: none;
+        padding: 0!important;
+        /* color: #069; */ /* Link color */
+        /* text-decoration: underline; */
+        cursor: pointer;
+        font-family: inherit;
+        font-size: inherit;
+        display: inline-block; /* Allows width/height and padding like a button */
+        /* Add other button-like styles if needed, or use existing .btn classes and override */
+        color: #C70039; /* Match link color */
     }
 </style>
 @endpush
