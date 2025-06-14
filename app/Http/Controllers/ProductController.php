@@ -35,9 +35,9 @@ class ProductController extends Controller
     {
         $brands = Brand::get();
         $categories = Category::where('is_parent', 1)->get();
-        $colors = Color::where('status', 'active')->orderBy('name')->get();
-        $sizes = Size::where('status', 'active')->orderBy('name')->get();
-        $specifications = Specification::where('status', 'active')->orderBy('name')->orderBy('value')->get();
+        $colors = Color::orderBy('name')->get();
+        $sizes = Size::orderBy('name')->get();
+        $specifications = Specification::orderBy('name')->orderBy('value')->get();
 
         return view('backend.product.create')
             ->with('categories', $categories)
@@ -149,9 +149,9 @@ class ProductController extends Controller
         $product = Product::with(['variants', 'variants.color', 'variants.size', 'variants.specification'])->findOrFail($id);
         $brands = Brand::get();
         $categories = Category::where('is_parent', 1)->get();
-        $colors = Color::where('status', 'active')->orderBy('name')->get();
-        $sizes = Size::where('status', 'active')->orderBy('name')->get();
-        $specifications = Specification::where('status', 'active')->orderBy('name')->orderBy('value')->get();
+        $colors = Color::orderBy('name')->get();
+        $sizes = Size::orderBy('name')->get();
+        $specifications = Specification::orderBy('name')->orderBy('value')->get();
 
         return view('backend.product.edit')
             ->with('product', $product)

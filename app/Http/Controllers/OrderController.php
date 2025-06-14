@@ -178,7 +178,21 @@ class OrderController extends Controller
      */
     public function show($id)
     {
-        $order=Order::with('orderItems.product', 'orderItems.variant.color', 'orderItems.variant.size', 'orderItems.variant.specification', 'shipping', 'user')->find($id);
+        $order=Order::with([
+            'orderItems',
+            'orderItems.product',
+            'orderItems.variant',
+            'orderItems.variant.color',
+            'orderItems.variant.size',
+            'orderItems.variant.specification',
+            'shipping',
+            'user'
+        ])->find($id);
+
+        if (!$order) {
+            request()->session()->flash('error', __('flash_messages.order_not_found'));
+            return redirect()->route('order.index');
+        }
         return view('backend.order.show')->with('order',$order);
     }
 
