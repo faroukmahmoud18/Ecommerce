@@ -53,6 +53,27 @@
         @include('backend.message.message')
       </li>
 
+      <!-- Nav Item - Language Switcher -->
+      <li class="nav-item dropdown no-arrow">
+          <a class="nav-link dropdown-toggle" href="#" id="languageDropdown" role="button"
+              data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <i class="fas fa-language fa-fw"></i>
+              <span>{{ __('Language') }} ({{ strtoupper(app()->getLocale()) }})</span>
+          </a>
+          <!-- Dropdown - Language Options -->
+          <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+              aria-labelledby="languageDropdown">
+              <a class="dropdown-item" href="{{ route('language.set', 'en') }}">
+                  <i class="fas fa-flag-usa fa-sm fa-fw mr-2 text-gray-400"></i>
+                  {{ __('English') }}
+              </a>
+              <a class="dropdown-item" href="{{ route('language.set', 'ar') }}">
+                  <i class="fas fa-flag fa-sm fa-fw mr-2 text-gray-400"></i> {{-- Using a generic flag for AR for now --}}
+                  {{ __('Arabic') }}
+              </a>
+          </div>
+      </li>
+
       <div class="topbar-divider d-none d-sm-block"></div>
 
       <!-- Nav Item - User Information -->

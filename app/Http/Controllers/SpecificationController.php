@@ -44,7 +44,7 @@ class SpecificationController extends Controller
             'status' => 'required|in:active,inactive',
         ]);
 
-        $data = $request->all();
+        $data = $request->validated(); // Use validated data
         $status = Specification::create($data);
 
         if ($status) {
@@ -89,7 +89,7 @@ class SpecificationController extends Controller
             'status' => 'required|in:active,inactive',
         ]);
 
-        $data = $request->all();
+        $data = $request->validated(); // Use validated data
         $status = $specification->fill($data)->save();
 
         if ($status) {

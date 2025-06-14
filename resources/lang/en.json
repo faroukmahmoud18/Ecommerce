@@ -326,5 +326,15 @@
     "sidebar.attributes_colors": "Colors",
     "admin_common.no_data_found": "No data found.",
     "admin_common.form_placeholder_name": "Enter name",
-    "admin_common.not_available_short": "N/A"
+    "admin_common.not_available_short": "N/A",
+    "flash.size_created_success": "Size successfully created",
+    "flash.size_updated_success": "Size successfully updated",
+    "flash.size_deleted_success": "Size successfully deleted",
+    "flash.size_delete_error_in_use": "Error: This size is currently in use and cannot be deleted.",
+    "size.page_title_index": "Sizes",
+    "size.add_new_button": "Add New Size",
+    "size.page_title_create": "Add Size",
+    "size.form_label_name_required": "Name <span class='text-danger'>*</span>",
+    "size.page_title_edit": "Edit Size",
+    "sidebar.attributes_sizes": "Sizes"
 }
