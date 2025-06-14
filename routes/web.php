@@ -156,6 +156,12 @@
         Route::resource('/shipping', 'ShippingController');
         // Coupon
         Route::resource('/coupon', 'CouponController');
+        // Color
+        Route::resource('color', \App\Http\Controllers\ColorController::class);
+        // Size
+        Route::resource('size', \App\Http\Controllers\SizeController::class);
+        // Specification
+        Route::resource('specification', \App\Http\Controllers\SpecificationController::class);
         // Settings
         Route::get('settings', [AdminController::class, 'settings'])->name('settings');
         Route::post('setting/update', [AdminController::class, 'settingsUpdate'])->name('settings.update');

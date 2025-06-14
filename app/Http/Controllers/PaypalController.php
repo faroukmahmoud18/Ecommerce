@@ -21,13 +21,13 @@ class PaypalController extends Controller
             return [
                 'name' =>$name ,
                 'price' => $item['price'],
-                'desc'  => 'Thank you for using paypal',
+                'desc'  => __('paypal.item_description'),
                 'qty' => $item['quantity']
             ];
         }, $cart);
 
         $data['invoice_id'] ='ORD-'.strtoupper(uniqid());
-        $data['invoice_description'] = "Order #{$data['invoice_id']} Invoice";
+        $data['invoice_description'] = "Order #{$data['invoice_id']} Invoice"; // Consider if "Invoice" needs localization
         $data['return_url'] = route('payment.success');
         $data['cancel_url'] = route('payment.cancel');
 
@@ -57,7 +57,9 @@ class PaypalController extends Controller
      */
     public function cancel()
     {
-        dd('Your payment is canceled. You can create cancel page here.');
+        // In a real app, replace dd with a view and proper flash message
+        request()->session()->flash('error', __('flash_messages.payment_cancelled_debug_message'));
+        return redirect()->route('home'); // Or a dedicated cancel page
     }
   
     /**
@@ -72,13 +74,13 @@ class PaypalController extends Controller
         // return $response;
   
         if (in_array(strtoupper($response['ACK']), ['SUCCESS', 'SUCCESSWITHWARNING'])) {
-            request()->session()->flash('success','You successfully pay from Paypal! Thank You');
+            request()->session()->flash('success',__('flash_messages.payment_paypal_success'));
             session()->forget('cart');
             session()->forget('coupon');
             return redirect()->route('home');
         }
   
-        request()->session()->flash('error','Something went wrong please try again!!!');
+        request()->session()->flash('error',__('flash_messages.error_something_went_wrong_paypal'));
         return redirect()->back();
     }
 }

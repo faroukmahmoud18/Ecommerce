@@ -73,16 +73,7 @@
           <span class="text-danger">{{$message}}</span>
           @enderror
         </div>
-        <div class="form-group">
-          <label for="size">{{__('product.form_label_size')}}</label>
-          <select name="size[]" class="form-control selectpicker"  multiple data-live-search="true">
-              <option value="">{{__('product.form_select_placeholder_size')}}</option>
-              <option value="S">{{__('product.form_option_size_s')}}</option>
-              <option value="M">{{__('product.form_option_size_m')}}</option>
-              <option value="L">{{__('product.form_option_size_l')}}</option>
-              <option value="XL">{{__('product.form_option_size_xl')}}</option>
-          </select>
-        </div>
+        {{-- Old Size Field Removed --}}
 
         <div class="form-group">
           <label for="brand_id">{{__('product.form_label_brand')}}</label>
@@ -139,7 +130,59 @@
           <span class="text-danger">{{$message}}</span>
           @enderror
         </div>
-        <div class="form-group mb-3">
+
+        <hr>
+        <h4>{{ __('product.section_title_variations') }}</h4>
+        <div id="product-variants-container">
+            {{-- Initial variation row --}}
+            <div class="product-variant-item row mb-2">
+                <div class="col-md-2">
+                    <label>{{ __('product.form_label_variant_color') }}</label>
+                    <select name="variants[0][color_id]" class="form-control">
+                        <option value="">{{ __('admin_common.form_select_placeholder_none') }}</option>
+                        @foreach($colors as $color)
+                            <option value="{{ $color->id }}">{{ $color->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label>{{ __('product.form_label_variant_size') }}</label>
+                    <select name="variants[0][size_id]" class="form-control">
+                        <option value="">{{ __('admin_common.form_select_placeholder_none') }}</option>
+                        @foreach($sizes as $size)
+                            <option value="{{ $size->id }}">{{ $size->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label>{{ __('product.form_label_variant_specification') }}</label>
+                    <select name="variants[0][specification_id]" class="form-control">
+                        <option value="">{{ __('admin_common.form_select_placeholder_none') }}</option>
+                        @foreach($specifications as $spec)
+                            <option value="{{ $spec->id }}">{{ $spec->name }} - {{ $spec->value }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label>{{ __('product.form_label_variant_price') }} <span class="text-danger">*</span></label>
+                    <input type="number" name="variants[0][price]" class="form-control" placeholder="{{ __('product.form_placeholder_price') }}" step="0.01" value="{{ old('variants.0.price') }}">
+                </div>
+                <div class="col-md-1">
+                    <label>{{ __('product.form_label_variant_stock') }} <span class="text-danger">*</span></label>
+                    <input type="number" name="variants[0][stock]" class="form-control" placeholder="{{ __('product.form_placeholder_stock') }}" step="1" value="{{ old('variants.0.stock') }}">
+                </div>
+                <div class="col-md-2">
+                    <label>{{ __('product.form_label_variant_sku') }}</label>
+                    <input type="text" name="variants[0][sku]" class="form-control" placeholder="{{ __('product.form_placeholder_sku') }}" value="{{ old('variants.0.sku') }}">
+                </div>
+                <div class="col-md-12 mt-1">
+                    <button type="button" class="btn btn-danger btn-sm remove-variant-btn" style="display:none;">{{ __('admin_common.button_remove') }}</button>
+                </div>
+            </div>
+        </div>
+        <button type="button" id="add-variant-btn" class="btn btn-info btn-sm mt-2">{{ __('product.button_add_variation') }}</button>
+
+        <div class="form-group mb-3 mt-3">
           <button type="reset" class="btn btn-warning">{{__('admin_common.button_reset')}}</button>
            <button class="btn btn-success" type="submit">{{__('admin_common.button_submit')}}</button>
         </div>
@@ -226,4 +269,80 @@
     }
   })
 </script>
+
+<script>
+    $(document).ready(function() {
+        let variantIndex = 0;
+        if ($('.product-variant-item').length > 0) {
+             variantIndex = $('.product-variant-item').length -1;
+        }
+
+        function updateRemoveButtons() {
+            if ($('.product-variant-item').length <= 1) {
+                $('.remove-variant-btn').hide();
+            } else {
+                $('.remove-variant-btn').show();
+            }
+        }
+        updateRemoveButtons();
+
+        $('#add-variant-btn').on('click', function() {
+            variantIndex++;
+            const variantHtml = `
+                <div class="product-variant-item row mb-2">
+                    <div class="col-md-2">
+                        <label>{{ __('product.form_label_variant_color') }}</label>
+                        <select name="variants[${variantIndex}][color_id]" class="form-control">
+                            <option value="">{{ __('admin_common.form_select_placeholder_none') }}</option>
+                            @foreach($colors as $color)
+                                <option value="{{ $color->id }}">{{ $color->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label>{{ __('product.form_label_variant_size') }}</label>
+                        <select name="variants[${variantIndex}][size_id]" class="form-control">
+                            <option value="">{{ __('admin_common.form_select_placeholder_none') }}</option>
+                            @foreach($sizes as $size)
+                                <option value="{{ $size->id }}">{{ $size->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label>{{ __('product.form_label_variant_specification') }}</label>
+                        <select name="variants[${variantIndex}][specification_id]" class="form-control">
+                            <option value="">{{ __('admin_common.form_select_placeholder_none') }}</option>
+                            @foreach($specifications as $spec)
+                                <option value="{{ $spec->id }}">{{ $spec->name }} - {{ $spec->value }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label>{{ __('product.form_label_variant_price') }} <span class="text-danger">*</span></label>
+                        <input type="number" name="variants[${variantIndex}][price]" class="form-control" placeholder="{{ __('product.form_placeholder_price') }}" step="0.01">
+                    </div>
+                    <div class="col-md-1">
+                        <label>{{ __('product.form_label_variant_stock') }} <span class="text-danger">*</span></label>
+                        <input type="number" name="variants[${variantIndex}][stock]" class="form-control" placeholder="{{ __('product.form_placeholder_stock') }}" step="1">
+                    </div>
+                    <div class="col-md-2">
+                        <label>{{ __('product.form_label_variant_sku') }}</label>
+                        <input type="text" name="variants[${variantIndex}][sku]" class="form-control" placeholder="{{ __('product.form_placeholder_sku') }}">
+                    </div>
+                    <div class="col-md-12 mt-1">
+                        <button type="button" class="btn btn-danger btn-sm remove-variant-btn">{{ __('admin_common.button_remove') }}</button>
+                    </div>
+                </div>`;
+            $('#product-variants-container').append(variantHtml);
+            updateRemoveButtons();
+        });
+
+        $('#product-variants-container').on('click', '.remove-variant-btn', function() {
+            $(this).closest('.product-variant-item').remove();
+            updateRemoveButtons();
+        });
+
+        updateRemoveButtons();
+    });
+    </script>
 @endpush
