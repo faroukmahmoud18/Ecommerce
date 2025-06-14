@@ -1,9 +1,6 @@
 <?php
 
-namespace Database\Seeders; // Added namespace
-
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB; // Added import for DB
 
 class SettingTableSeeder extends Seeder
 {

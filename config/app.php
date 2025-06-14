@@ -164,7 +164,7 @@ return [
 
         // unisharp
         UniSharp\LaravelFilemanager\LaravelFilemanagerServiceProvider::class,
-        // Intervention\Image\Laravel\ServiceProvider::class, // Corrected for v3 - Commenting out due to FS issues
+        Intervention\Image\Laravel\ServiceProvider::class, // Updated for v3
         Barryvdh\DomPDF\ServiceProvider::class,
         Srmklive\PayPal\Providers\PayPalServiceProvider::class,
         Laravel\Socialite\SocialiteServiceProvider::class,
@@ -233,7 +233,7 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
         // unisharp
-        // 'Image' => Intervention\Image\Laravel\Facades\Image::class, // Corrected for v3 - Commenting out due to FS issues
+        'Image' => Intervention\Image\Laravel\Facades\Image::class, // Updated for v3
         'PDF' => Barryvdh\DomPDF\Facade::class,
         'PayPal' => Srmklive\PayPal\Facades\PayPal::class,
         'Socialite' => Laravel\Socialite\Facades\Socialite::class,

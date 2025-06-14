@@ -8,23 +8,30 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
+     *
+     * @return void
      */
-    public function up(): void
+    public function up()
     {
         Schema::create('specifications', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('value');
+            // Name and value combined should be unique, e.g. "Material: Cotton", "Material: Polyester"
+            // A single product might have "Material: Cotton" and "Storage: 128GB"
+            // Thus 'name' alone is not unique.
+            $table->string('name'); // e.g., Material, Capacity
+            $table->string('value'); // e.g., Cotton, 128GB
             $table->timestamps();
 
-            $table->unique(['name', 'value']); // Changed unique constraint
+            $table->unique(['name', 'value']);
         });
     }
 
     /**
      * Reverse the migrations.
+     *
+     * @return void
      */
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('specifications');
     }

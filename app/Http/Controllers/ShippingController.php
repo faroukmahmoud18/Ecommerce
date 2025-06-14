@@ -46,10 +46,10 @@ class ShippingController extends Controller
         // return $data;
         $status=Shipping::create($data);
         if($status){
-            request()->session()->flash('success','Shipping successfully created');
+            request()->session()->flash('success',__('flash_messages.shipping_created_success'));
         }
         else{
-            request()->session()->flash('error','Error, Please try again');
+            request()->session()->flash('error',__('flash_messages.error_please_try_again'));
         }
         return redirect()->route('shipping.index');
     }
@@ -75,7 +75,7 @@ class ShippingController extends Controller
     {
         $shipping=Shipping::find($id);
         if(!$shipping){
-            request()->session()->flash('error','Shipping not found');
+            request()->session()->flash('error',__('flash_messages.shipping_not_found'));
         }
         return view('backend.shipping.edit')->with('shipping',$shipping);
     }
@@ -99,10 +99,10 @@ class ShippingController extends Controller
         // return $data;
         $status=$shipping->fill($data)->save();
         if($status){
-            request()->session()->flash('success','Shipping successfully updated');
+            request()->session()->flash('success',__('flash_messages.shipping_updated_success'));
         }
         else{
-            request()->session()->flash('error','Error, Please try again');
+            request()->session()->flash('error',__('flash_messages.error_please_try_again'));
         }
         return redirect()->route('shipping.index');
     }
@@ -119,15 +119,15 @@ class ShippingController extends Controller
         if($shipping){
             $status=$shipping->delete();
             if($status){
-                request()->session()->flash('success','Shipping successfully deleted');
+                request()->session()->flash('success',__('flash_messages.shipping_deleted_success'));
             }
             else{
-                request()->session()->flash('error','Error, Please try again');
+                request()->session()->flash('error',__('flash_messages.error_please_try_again'));
             }
             return redirect()->route('shipping.index');
         }
         else{
-            request()->session()->flash('error','Shipping not found');
+            request()->session()->flash('error',__('flash_messages.shipping_not_found'));
             return redirect()->back();
         }
     }

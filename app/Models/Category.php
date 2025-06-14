@@ -3,11 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory; // Added
 
 class Category extends Model
 {
-    use HasFactory; // Added
     protected $fillable=['title','slug','summary','photo','status','is_parent','parent_id','added_by'];
 
     public function parent_info(){
@@ -37,14 +35,13 @@ class Category extends Model
         return $this->hasMany('App\Models\Product','child_cat_id','id')->where('status','active');
     }
     public static function getProductByCat($slug){
-        return Category::with(['products' => function ($query) {
-            $query->withCount('variants');
-        }])->where('slug',$slug)->first();
+        // dd($slug);
+        return Category::with('products')->where('slug',$slug)->first();
+        // return Product::where('cat_id',$id)->where('child_cat_id',null)->paginate(10);
     }
     public static function getProductBySubCat($slug){
-        return Category::with(['sub_products' => function ($query) {
-            $query->withCount('variants');
-        }])->where('slug',$slug)->first();
+        // return $slug;
+        return Category::with('sub_products')->where('slug',$slug)->first();
     }
     public static function countActiveCategory(){
         $data=Category::where('status','active')->count();

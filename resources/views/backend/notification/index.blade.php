@@ -1,5 +1,5 @@
 @extends('backend.layouts.master')
-@section('title','E-SHOP || All Notifications')
+@section('title',__('notification.page_title_all_notifications'))
 @section('main-content')
 <div class="card">
     <div class="row">
@@ -7,16 +7,16 @@
            @include('backend.layouts.notification')
         </div>
     </div>
-  <h5 class="card-header">Notifications</h5>
+  <h5 class="card-header">{{__('notification.header_notifications')}}</h5>
   <div class="card-body">
     @if(count(Auth::user()->Notifications)>0)
     <table class="table  table-hover admin-table" id="notification-dataTable">
       <thead>
         <tr>
-          <th scope="col">#</th>
-          <th scope="col">Time</th>
-          <th scope="col">Title</th>
-          <th scope="col">Action</th>
+          <th scope="col">{{__('admin_common.table_header_hash')}}</th>
+          <th scope="col">{{__('admin_common.table_header_time')}}</th>
+          <th scope="col">{{__('admin_common.table_header_title')}}</th>
+          <th scope="col">{{__('admin_common.table_header_actions')}}</th>
         </tr>
       </thead>
       <tbody>
@@ -27,11 +27,11 @@
           <td>{{$notification->created_at->format('F d, Y h:i A')}}</td>
           <td>{{$notification->data['title']}}</td>
           <td>
-            <a href="{{route('admin.notification', $notification->id) }}" class="btn btn-primary btn-sm float-left mr-1" style="height:30px; width:30px;border-radius:50%" data-toggle="tooltip" title="view" data-placement="bottom"><i class="fas fa-eye"></i></a>
+            <a href="{{route('admin.notification', $notification->id) }}" class="btn btn-primary btn-sm float-left mr-1" style="height:30px; width:30px;border-radius:50%" data-toggle="tooltip" title="{{__('admin_common.view_button_tooltip')}}" data-placement="bottom"><i class="fas fa-eye"></i></a>
             <form method="POST" action="{{ route('notification.delete', $notification->id) }}">
               @csrf
               @method('delete')
-                  <button class="btn btn-danger btn-sm dltBtn" data-id={{$notification->id}} style="height:30px; width:30px;border-radius:50%" data-toggle="tooltip" data-placement="bottom" title="Delete"><i class="fas fa-trash-alt"></i></button>
+                  <button class="btn btn-danger btn-sm dltBtn" data-id={{$notification->id}} style="height:30px; width:30px;border-radius:50%" data-toggle="tooltip" data-placement="bottom" title="{{__('admin_common.delete_button_tooltip')}}"><i class="fas fa-trash-alt"></i></button>
             </form>
           </td>
         </tr>
@@ -40,7 +40,7 @@
       </tbody>
     </table>
     @else
-      <h2>Notifications Empty!</h2>
+      <h2>{{__('notification.no_notifications_empty')}}</h2>
     @endif
   </div>
 </div>
@@ -87,8 +87,8 @@
             // alert(dataID);
             e.preventDefault();
             swal({
-                  title: "Are you sure?",
-                  text: "Once deleted, you will not be able to recover this data!",
+                  title: "{{__('admin_common.sweetalert_title_are_you_sure')}}",
+                  text: "{{__('admin_common.sweetalert_text_once_deleted')}}",
                   icon: "warning",
                   buttons: true,
                   dangerMode: true,
@@ -97,7 +97,7 @@
                   if (willDelete) {
                     form.submit();
                   } else {
-                      swal("Your data is safe!");
+                      swal("{{__('admin_common.sweetalert_text_data_safe')}}");
                   }
               });
         })

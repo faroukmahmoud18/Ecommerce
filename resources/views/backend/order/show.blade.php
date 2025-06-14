@@ -1,12 +1,12 @@
 @extends('backend.layouts.master')
 
-@section('title','Order Detail')
+@section('title',__('order.page_title_show'))
 
 @section('main-content')
 <div class="card">
-  <h5 class="card-header">Order       
+  <h5 class="card-header">{{__('order.section_title_order')}}
     <a href="{{route('order.pdf',$order->id)}}" class="btn btn-sm btn-primary shadow-sm float-right">
-      <i class="fas fa-download fa-sm text-white-50"></i> Generate PDF
+      <i class="fas fa-download fa-sm text-white-50"></i> {{__('order.button_generate_pdf')}}
     </a>
   </h5>
   <div class="card-body">
@@ -14,15 +14,15 @@
     <table class="table table-striped table-hover">
       <thead>
         <tr>
-            <th>S.N.</th>
-            <th>Order No.</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Quantity</th>
-            <th>Charge</th>
-            <th>Total Amount</th>
-            <th>Status</th>
-            <th>Action</th>
+            <th>{{__('admin_common.table_header_sn')}}</th>
+            <th>{{__('order.table_header_order_no')}}</th>
+            <th>{{__('order.table_header_name')}}</th>
+            <th>{{__('order.table_header_email')}}</th>
+            <th>{{__('order.table_header_quantity')}}</th>
+            <th>{{__('order.table_header_charge')}}</th>
+            <th>{{__('order.table_header_total_amount')}}</th>
+            <th>{{__('admin_common.table_header_status')}}</th>
+            <th>{{__('admin_common.table_header_actions')}}</th>
         </tr>
       </thead>
       <tbody>
@@ -50,11 +50,11 @@
                 @endif
             </td>
             <td>
-                <a href="{{route('order.edit',$order->id)}}" class="btn btn-primary btn-sm float-left mr-1" style="height:30px; width:30px;border-radius:50%" data-toggle="tooltip" title="edit" data-placement="bottom"><i class="fas fa-edit"></i></a>
+                <a href="{{route('order.edit',$order->id)}}" class="btn btn-primary btn-sm float-left mr-1" style="height:30px; width:30px;border-radius:50%" data-toggle="tooltip" title="{{__('admin_common.edit_button_tooltip')}}" data-placement="bottom"><i class="fas fa-edit"></i></a>
                 <form method="POST" action="{{route('order.destroy',[$order->id])}}">
                   @csrf
                   @method('delete')
-                      <button class="btn btn-danger btn-sm dltBtn" data-id={{$order->id}} style="height:30px; width:30px;border-radius:50%" data-toggle="tooltip" data-placement="bottom" title="Delete"><i class="fas fa-trash-alt"></i></button>
+                      <button class="btn btn-danger btn-sm dltBtn" data-id={{$order->id}} style="height:30px; width:30px;border-radius:50%" data-toggle="tooltip" data-placement="bottom" title="{{__('admin_common.delete_button_tooltip')}}"><i class="fas fa-trash-alt"></i></button>
                 </form>
             </td>
         </tr>
@@ -62,17 +62,17 @@
     </table>
 
     <!-- Order Product Details -->
-    <h4 class="text-center pb-4">Order Products</h4>
+    <h4 class="text-center pb-4">{{__('order.section_title_order_products')}}</h4>
     <table class="table table-striped">
       <thead>
         <tr>
-          <th>S.N.</th>
-          <th>Image</th>
-          <th>Product Name</th>
-          <th>Price</th>
-          <th>Size</th>
-          <th>Quantity</th>
-          <th>Subtotal</th>
+          <th>{{__('admin_common.table_header_sn')}}</th>
+          <th>{{__('order.table_header_image')}}</th>
+          <th>{{__('order.table_header_product_name')}}</th>
+          <th>{{__('admin_common.table_header_price')}}</th>
+          <th>{{__('admin_common.table_header_size')}}</th>
+          <th>{{__('order.table_header_quantity')}}</th>
+          <th>{{__('order.table_header_subtotal')}}</th>
         </tr>
       </thead>
       <tbody>
@@ -95,26 +95,26 @@
         <div class="row">
           <div class="col-lg-6 col-lx-4">
             <div class="order-info">
-              <h4 class="text-center pb-4">ORDER INFORMATION</h4>
+              <h4 class="text-center pb-4">{{__('order.section_title_order_information')}}</h4>
               <table class="table">
                     <tr class="">
-                        <td>Order Number</td>
+                        <td>{{__('order.label_order_number')}}</td>
                         <td> : {{$order->order_number}}</td>
                     </tr>
                     <tr>
-                        <td>Order Date</td>
+                        <td>{{__('order.label_order_date')}}</td>
                         <td> : {{$order->created_at->format('D d M, Y')}} at {{$order->created_at->format('g : i a')}} </td>
                     </tr>
                     <tr>
-                        <td>Quantity</td>
+                        <td>{{__('order.label_quantity')}}</td>
                         <td> : {{$order->quantity}}</td>
                     </tr>
                     <tr>
-                        <td>Order Status</td>
+                        <td>{{__('order.label_order_status')}}</td>
                         <td> : {{$order->status}}</td>
                     </tr>
                     <tr>
-                        <td>Shipping Charge</td>
+                        <td>{{__('order.label_shipping_charge')}}</td>
                         @if(empty($order->shipping->price))
                         <td>0.00</td>
                         @else
@@ -122,19 +122,19 @@
                         @endif
                     </tr>
                     <tr>
-                      <td>Coupon</td>
+                      <td>{{__('order.label_coupon')}}</td>
                       <td> : $ {{number_format($order->coupon,2)}}</td>
                     </tr>
                     <tr>
-                        <td>Total Amount</td>
+                        <td>{{__('order.label_total_amount')}}</td>
                         <td> : $ {{number_format($order->total_amount,2)}}</td>
                     </tr>
                     <tr>
-                        <td>Payment Method</td>
-                        <td> : @if($order->payment_method=='cod') Cash on Delivery @else Paypal @endif</td>
+                        <td>{{__('order.label_payment_method')}}</td>
+                        <td> : @if($order->payment_method=='cod') {{__('order.payment_method_cod')}} @else {{__('order.payment_method_paypal')}} @endif</td>
                     </tr>
                     <tr>
-                        <td>Payment Status</td>
+                        <td>{{__('order.label_payment_status')}}</td>
                         <td> : {{$order->payment_status}}</td>
                     </tr>
               </table>
@@ -143,30 +143,30 @@
 
           <div class="col-lg-6 col-lx-4">
             <div class="shipping-info">
-              <h4 class="text-center pb-4">SHIPPING INFORMATION</h4>
+              <h4 class="text-center pb-4">{{__('order.section_title_shipping_information')}}</h4>
               <table class="table">
                     <tr class="">
-                        <td>Full Name</td>
+                        <td>{{__('order.label_full_name')}}</td>
                         <td> : {{$order->first_name}} {{$order->last_name}}</td>
                     </tr>
                     <tr>
-                        <td>Email</td>
+                        <td>{{__('order.label_email')}}</td>
                         <td> : {{$order->email}}</td>
                     </tr>
                     <tr>
-                        <td>Phone No.</td>
+                        <td>{{__('order.label_phone_no')}}</td>
                         <td> : {{$order->phone}}</td>
                     </tr>
                     <tr>
-                        <td>Address</td>
+                        <td>{{__('order.label_address')}}</td>
                         <td> : {{$order->address1}}, {{$order->address2}}</td>
                     </tr>
                     <tr>
-                        <td>Country</td>
+                        <td>{{__('order.label_country')}}</td>
                         <td> : {{$order->country}}</td>
                     </tr>
                     <tr>
-                        <td>Post Code</td>
+                        <td>{{__('order.label_post_code')}}</td>
                         <td> : {{$order->post_code}}</td>
                     </tr>
               </table>

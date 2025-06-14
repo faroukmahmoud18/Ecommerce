@@ -49,10 +49,10 @@ class PostTagController extends Controller
         $data['slug']=$slug;
         $status=PostTag::create($data);
         if($status){
-            request()->session()->flash('success','Post Tag Successfully added');
+            request()->session()->flash('success',__('flash_messages.post_tag_added_success'));
         }
         else{
-            request()->session()->flash('error','Please try again!!');
+            request()->session()->flash('error',__('flash_messages.error_please_try_again'));
         }
         return redirect()->route('post-tag.index');
     }
@@ -98,10 +98,10 @@ class PostTagController extends Controller
         $data=$request->all();
         $status=$postTag->fill($data)->save();
         if($status){
-            request()->session()->flash('success','Post Tag Successfully updated');
+            request()->session()->flash('success',__('flash_messages.post_tag_updated_success'));
         }
         else{
-            request()->session()->flash('error','Please try again!!');
+            request()->session()->flash('error',__('flash_messages.error_please_try_again'));
         }
         return redirect()->route('post-tag.index');
     }
@@ -119,10 +119,10 @@ class PostTagController extends Controller
         $status=$postTag->delete();
         
         if($status){
-            request()->session()->flash('success','Post Tag successfully deleted');
+            request()->session()->flash('success',__('flash_messages.post_tag_deleted_success'));
         }
         else{
-            request()->session()->flash('error','Error while deleting post tag');
+            request()->session()->flash('error',__('flash_messages.post_tag_deleted_error'));
         }
         return redirect()->route('post-tag.index');
     }
