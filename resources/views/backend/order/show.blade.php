@@ -80,7 +80,27 @@
         <tr>
           <td>{{ $loop->iteration }}</td>
           <td><img src="{{ asset($item->image) }}" alt="Product Image" style="width:50px"></td>
-          <td>{{ $item->name }}</td>
+          <td>
+            {{ $item->name }}
+            @if($item->variant)
+                <div style="font-size: 0.9em; color: #555;">
+                    <small>
+                        @if($item->variant->sku)
+                            SKU: {{ $item->variant->sku }}<br>
+                        @endif
+                        @if($item->variant->color)
+                            {{ __('cart.label_color') }}: {{ $item->variant->color->name }}<br>
+                        @endif
+                        @if($item->variant->size)
+                            {{ __('cart.label_size') }}: {{ $item->variant->size->name }}<br>
+                        @endif
+                        @if($item->variant->specification)
+                            {{ $item->variant->specification->name }}: {{ $item->variant->specification->value }}
+                        @endif
+                    </small>
+                </div>
+            @endif
+          </td>
           <td>${{ number_format($item->price, 2) }}</td>
           <td>{{ $item->size }}</td>
           <td>{{ $item->quantity }}</td>
