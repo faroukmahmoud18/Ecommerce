@@ -77,22 +77,7 @@
           <span class="text-danger">{{$message}}</span>
           @enderror
         </div>
-        <div class="form-group">
-          <label for="size">{{__('product.form_label_size')}}</label>
-          <select name="size[]" class="form-control selectpicker"  multiple data-live-search="true">
-              <option value="">{{__('product.form_select_placeholder_size')}}</option>
-              @foreach($items as $item)
-                @php
-                $data=explode(',',$item->size);
-                // dd($data);
-                @endphp
-              <option value="S"  @if( in_array( "S",$data ) ) selected @endif>{{__('product.form_option_small_short')}}</option>
-              <option value="M"  @if( in_array( "M",$data ) ) selected @endif>{{__('product.form_option_medium_short')}}</option>
-              <option value="L"  @if( in_array( "L",$data ) ) selected @endif>{{__('product.form_option_large_short')}}</option>
-              <option value="XL"  @if( in_array( "XL",$data ) ) selected @endif>{{__('product.form_option_extralarge_short')}}</option>
-              @endforeach
-          </select>
-        </div>
+        {{-- Old Size Field Removed --}}
         <div class="form-group">
           <label for="brand_id">{{__('product.form_label_brand')}}</label>
           <select name="brand_id" class="form-control">
@@ -146,7 +131,111 @@
           <span class="text-danger">{{$message}}</span>
           @enderror
         </div>
-        <div class="form-group mb-3">
+
+        <hr>
+        <h4>{{ __('product.section_title_variations') }}</h4>
+        <div id="product-variants-container">
+            @php $variant_idx = 0; @endphp
+            @if($product->variants && $product->variants->count() > 0)
+                @foreach($product->variants as $variant_item)
+                    <div class="product-variant-item row mb-2">
+                        <input type="hidden" name="variants[{{ $variant_idx }}][id]" value="{{ $variant_item->id }}">
+                        <div class="col-md-2">
+                            <label>{{ __('product.form_label_variant_color') }}</label>
+                            <select name="variants[{{ $variant_idx }}][color_id]" class="form-control">
+                                <option value="">{{ __('admin_common.form_select_placeholder_none') }}</option>
+                                @foreach($colors as $color)
+                                    <option value="{{ $color->id }}" {{ old('variants.'.$variant_idx.'.color_id', $variant_item->color_id) == $color->id ? 'selected' : '' }}>{{ $color->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label>{{ __('product.form_label_variant_size') }}</label>
+                            <select name="variants[{{ $variant_idx }}][size_id]" class="form-control">
+                                <option value="">{{ __('admin_common.form_select_placeholder_none') }}</option>
+                                @foreach($sizes as $size)
+                                    <option value="{{ $size->id }}" {{ old('variants.'.$variant_idx.'.size_id', $variant_item->size_id) == $size->id ? 'selected' : '' }}>{{ $size->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label>{{ __('product.form_label_variant_specification') }}</label>
+                            <select name="variants[{{ $variant_idx }}][specification_id]" class="form-control">
+                                <option value="">{{ __('admin_common.form_select_placeholder_none') }}</option>
+                                @foreach($specifications as $spec)
+                                    <option value="{{ $spec->id }}" {{ old('variants.'.$variant_idx.'.specification_id', $variant_item->specification_id) == $spec->id ? 'selected' : '' }}>{{ $spec->name }} - {{ $spec->value }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label>{{ __('product.form_label_variant_price') }} <span class="text-danger">*</span></label>
+                            <input type="number" name="variants[{{ $variant_idx }}][price]" class="form-control" value="{{ old('variants.'.$variant_idx.'.price', $variant_item->price) }}" placeholder="{{ __('product.form_placeholder_price') }}" step="0.01">
+                        </div>
+                        <div class="col-md-1">
+                            <label>{{ __('product.form_label_variant_stock') }} <span class="text-danger">*</span></label>
+                            <input type="number" name="variants[{{ $variant_idx }}][stock]" class="form-control" value="{{ old('variants.'.$variant_idx.'.stock', $variant_item->stock) }}" placeholder="{{ __('product.form_placeholder_stock') }}" step="1">
+                        </div>
+                        <div class="col-md-2">
+                            <label>{{ __('product.form_label_variant_sku') }}</label>
+                            <input type="text" name="variants[{{ $variant_idx }}][sku]" class="form-control" value="{{ old('variants.'.$variant_idx.'.sku', $variant_item->sku) }}" placeholder="{{ __('product.form_placeholder_sku') }}">
+                        </div>
+                        <div class="col-md-12 mt-1">
+                            <button type="button" class="btn btn-danger btn-sm remove-variant-btn">{{ __('admin_common.button_remove') }}</button>
+                        </div>
+                    </div>
+                    @php $variant_idx++; @endphp
+                @endforeach
+            @else
+                {{-- Display one empty row if no variants exist --}}
+                <div class="product-variant-item row mb-2">
+                    <div class="col-md-2">
+                        <label>{{ __('product.form_label_variant_color') }}</label>
+                        <select name="variants[0][color_id]" class="form-control">
+                            <option value="">{{ __('admin_common.form_select_placeholder_none') }}</option>
+                            @foreach($colors as $color)
+                                <option value="{{ $color->id }}">{{ $color->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label>{{ __('product.form_label_variant_size') }}</label>
+                        <select name="variants[0][size_id]" class="form-control">
+                            <option value="">{{ __('admin_common.form_select_placeholder_none') }}</option>
+                            @foreach($sizes as $size)
+                                <option value="{{ $size->id }}">{{ $size->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label>{{ __('product.form_label_variant_specification') }}</label>
+                        <select name="variants[0][specification_id]" class="form-control">
+                            <option value="">{{ __('admin_common.form_select_placeholder_none') }}</option>
+                            @foreach($specifications as $spec)
+                                <option value="{{ $spec->id }}">{{ $spec->name }} - {{ $spec->value }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label>{{ __('product.form_label_variant_price') }} <span class="text-danger">*</span></label>
+                        <input type="number" name="variants[0][price]" class="form-control" placeholder="{{ __('product.form_placeholder_price') }}" step="0.01">
+                    </div>
+                    <div class="col-md-1">
+                        <label>{{ __('product.form_label_variant_stock') }} <span class="text-danger">*</span></label>
+                        <input type="number" name="variants[0][stock]" class="form-control" placeholder="{{ __('product.form_placeholder_stock') }}" step="1">
+                    </div>
+                    <div class="col-md-2">
+                        <label>{{ __('product.form_label_variant_sku') }}</label>
+                        <input type="text" name="variants[0][sku]" class="form-control" placeholder="{{ __('product.form_placeholder_sku') }}">
+                    </div>
+                    <div class="col-md-12 mt-1">
+                        <button type="button" class="btn btn-danger btn-sm remove-variant-btn" style="display:none;">{{ __('admin_common.button_remove') }}</button>
+                    </div>
+                </div>
+            @endif
+        </div>
+        <button type="button" id="add-variant-btn" class="btn btn-info btn-sm mt-2">{{ __('product.button_add_new_variation') }}</button>
+
+        <div class="form-group mb-3 mt-3">
            <button class="btn btn-success" type="submit">{{__('admin_common.button_update')}}</button>
         </div>
       </form>
@@ -183,6 +272,93 @@
       });
     });
 </script>
+
+<script>
+    $(document).ready(function() {
+        let variantIndex = {{ $product->variants->count() > 0 ? $product->variants->count() -1 : -1 }};
+        // If no variants rendered by PHP and container is empty, first new is index 0.
+        // If variants ARE rendered, variantIndex is set to the last index of those.
+        // So, first click on "add" should increment to the next correct new index.
+        if ($('.product-variant-item').length === 0 && {{ $product->variants->count() === 0 }}) {
+             variantIndex = -1;
+        }
+
+
+        function updateRemoveButtons() {
+            if ($('.product-variant-item').length <= 1) {
+                 if ($('.product-variant-item').find('input[name$="[id]"]').length > 0 && $('.product-variant-item').length === 1) {
+                    $('.remove-variant-btn').show();
+                 } else {
+                    $('.remove-variant-btn').hide();
+                 }
+            } else {
+                $('.remove-variant-btn').show();
+            }
+        }
+        // Initial call to set button visibility based on pre-rendered variants
+        updateRemoveButtons();
+
+
+        $('#add-variant-btn').on('click', function() {
+            variantIndex++;
+            const newVariantHtml = `
+            <div class="product-variant-item row mb-2">
+                {{-- NO hidden ID input for new rows --}}
+                <div class="col-md-2">
+                    <label>{{ __('product.form_label_variant_color') }}</label>
+                    <select name="variants[${variantIndex}][color_id]" class="form-control">
+                        <option value="">{{ __('admin_common.form_select_placeholder_none') }}</option>
+                        @foreach($colors as $color)
+                            <option value="{{ $color->id }}">{{ $color->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label>{{ __('product.form_label_variant_size') }}</label>
+                    <select name="variants[${variantIndex}][size_id]" class="form-control">
+                        <option value="">{{ __('admin_common.form_select_placeholder_none') }}</option>
+                        @foreach($sizes as $size)
+                            <option value="{{ $size->id }}">{{ $size->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label>{{ __('product.form_label_variant_specification') }}</label>
+                    <select name="variants[${variantIndex}][specification_id]" class="form-control">
+                        <option value="">{{ __('admin_common.form_select_placeholder_none') }}</option>
+                        @foreach($specifications as $spec)
+                            <option value="{{ $spec->id }}">{{ $spec->name }} - {{ $spec->value }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label>{{ __('product.form_label_variant_price') }} <span class="text-danger">*</span></label>
+                    <input type="number" name="variants[${variantIndex}][price]" class="form-control" placeholder="{{ __('product.form_placeholder_price') }}" step="0.01">
+                </div>
+                <div class="col-md-1">
+                    <label>{{ __('product.form_label_variant_stock') }} <span class="text-danger">*</span></label>
+                    <input type="number" name="variants[${variantIndex}][stock]" class="form-control" placeholder="{{ __('product.form_placeholder_stock') }}" step="1">
+                </div>
+                <div class="col-md-2">
+                    <label>{{ __('product.form_label_variant_sku') }}</label>
+                    <input type="text" name="variants[${variantIndex}][sku]" class="form-control" placeholder="{{ __('product.form_placeholder_sku') }}">
+                </div>
+                <div class="col-md-12 mt-1">
+                    <button type="button" class="btn btn-danger btn-sm remove-variant-btn">{{ __('admin_common.button_remove') }}</button>
+                </div>
+            </div>`;
+            $('#product-variants-container').append(newVariantHtml);
+            updateRemoveButtons();
+        });
+
+        $('#product-variants-container').on('click', '.remove-variant-btn', function() {
+            $(this).closest('.product-variant-item').remove();
+            updateRemoveButtons();
+        });
+        // Call again for initial state after page load, especially if there's only one existing variant
+        updateRemoveButtons();
+    });
+    </script>
 
 <script>
   var  child_cat_id='{{$product->child_cat_id}}';
