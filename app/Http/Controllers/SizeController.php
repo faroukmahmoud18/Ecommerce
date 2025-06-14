@@ -35,7 +35,7 @@ class SizeController extends Controller
             'status' => 'required|in:active,inactive',
         ]);
 
-        $data = $request->all();
+        $data = $request->validated(); // Use validated data
         $status = Size::create($data);
 
         if ($status) {
@@ -72,7 +72,7 @@ class SizeController extends Controller
             'status' => 'required|in:active,inactive',
         ]);
 
-        $data = $request->all();
+        $data = $request->validated(); // Use validated data
         $status = $size->fill($data)->save();
 
         if ($status) {

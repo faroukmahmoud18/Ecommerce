@@ -336,18 +336,5 @@
     "size.page_title_create": "AR: Add Size",
     "size.form_label_name_required": "AR: Name <span class='text-danger'>*</span>",
     "size.page_title_edit": "AR: Edit Size",
-    "sidebar.attributes_sizes": "AR: Sizes",
-    "flash.specification_created_success": "AR: Specification successfully created",
-    "flash.specification_updated_success": "AR: Specification successfully updated",
-    "flash.specification_deleted_success": "AR: Specification successfully deleted",
-    "flash.specification_delete_error_in_use": "AR: Error: This specification is currently in use and cannot be deleted.",
-    "specification.page_title_index": "AR: Specifications",
-    "specification.add_new_button": "AR: Add New Specification",
-    "specification.table_header_value": "AR: Value",
-    "specification.page_title_create": "AR: Add Specification",
-    "specification.form_label_name_required": "AR: Name <span class='text-danger'>*</span>",
-    "specification.form_label_value_required": "AR: Value <span class='text-danger'>*</span>",
-    "specification.form_placeholder_value": "AR: Enter value",
-    "specification.page_title_edit": "AR: Edit Specification",
-    "sidebar.attributes_specifications": "AR: Specifications"
+    "sidebar.attributes_sizes": "AR: Sizes"
 }

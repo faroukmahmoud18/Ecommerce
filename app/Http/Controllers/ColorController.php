@@ -36,7 +36,7 @@ class ColorController extends Controller
             'status' => 'required|in:active,inactive',
         ]);
 
-        $data = $request->all();
+        $data = $request->validated(); // Use validated data
         $status = Color::create($data);
 
         if ($status) {
@@ -75,7 +75,7 @@ class ColorController extends Controller
             'status' => 'required|in:active,inactive',
         ]);
 
-        $data = $request->all();
+        $data = $request->validated(); // Use validated data
         $status = $color->fill($data)->save();
 
         if ($status) {
