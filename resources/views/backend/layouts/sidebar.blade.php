@@ -98,6 +98,22 @@
         </div>
     </li>
 
+    {{-- Attributes --}}
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseAttributes" aria-expanded="true" aria-controls="collapseAttributes">
+          <i class="fas fa-fw fa-palette"></i>
+          <span>{{__('sidebar.attributes_menu')}}</span>
+        </a>
+        <div id="collapseAttributes" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+          <div class="bg-white py-2 collapse-inner rounded">
+            <h6 class="collapse-header">{{__('sidebar.attributes_options')}}:</h6>
+            <a class="collapse-item" href="{{route('color.index')}}">{{__('sidebar.attributes_colors')}}</a>
+            <a class="collapse-item" href="{{route('size.index')}}">{{__('sidebar.attributes_sizes')}}</a>
+            <a class="collapse-item" href="{{route('specification.index')}}">{{__('sidebar.attributes_specifications')}}</a>
+          </div>
+        </div>
+    </li>
+
     {{-- Shipping --}}
     <li class="nav-item">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#shippingCollapse" aria-expanded="true" aria-controls="shippingCollapse">
